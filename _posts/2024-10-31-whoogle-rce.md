@@ -55,7 +55,8 @@ Once again, here is the [PoC](https://gist.github.com/fern89/ca5fe76ad81b4bc363e
 
 ### Timeline
 2024-10-31 - Reported vulnerability
-2024-11-01 - Vulnerability patched, blogpost released
+
+2024-11-01 - Vulnerability [patched](https://github.com/benbusby/whoogle-search/commit/223f00c3c0533423114f99b30c561278bc0b42ba), blogpost released
 
 ## Addendum
 While researching this vulnerability, I have noticed past researchers also discovering several different vulnerabilities, including a [SSRF](https://nvd.nist.gov/vuln/detail/CVE-2024-22203), [XSS](https://nvd.nist.gov/vuln/detail/CVE-2024-22417), [another SSRF](https://nvd.nist.gov/vuln/detail/CVE-2024-22205), and [path traversal](https://nvd.nist.gov/vuln/detail/CVE-2024-22204). What is particularly interesting about this, is that these vulnerabilities were all discovered in version 0.8.3, which is a version affected by this RCE exploit! So I was genuinely surprised to find out, that the researcher who discovered those exploits, missed the RCE. Not trying to throw shade onto the researcher, just goes to show that even though we may think a project secure, there will almost always be more vulnerabilities lurking behind.
