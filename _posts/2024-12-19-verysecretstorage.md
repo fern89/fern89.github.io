@@ -110,7 +110,7 @@ case DO_DELETE: {
 Finally a vulnerability! Note how the box pointer is not cleared and left dangling. This will be the basis of our exploit.
 
 ## Step 0: Setup
-Before exploiting, we usually have some code to set the CPU affinity of the process - this is to ensure we stay on a single thread, and hence a single cache within the kernel, making our lives far easier.
+Before exploiting, we usually have some code to set the CPU affinity of the process - this is to ensure we stay on a single core, and hence a single cache within the kernel, making our lives far easier.
 ```c
 puts("Setting CPU affinity...");
 cpu_set_t cpu;
