@@ -1,6 +1,6 @@
 ---
 layout: post
-title: Whoogle RCE
+title: Whoogle RCE - CVE-2024-53305
 date: 2024-10-31
 categories: vuln-research
 description: Unauthenticated RCE in Whoogle
