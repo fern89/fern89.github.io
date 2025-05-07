@@ -4,6 +4,4 @@ icon: fas fa-info-circle
 order: 4
 ---
 
-Hello, I'm a student interested in **malware, vulnerabilities, and CTF**. In this blog, I will try to detail some of the vulnerabilities I discover, as well as interesting/poorly documented malware techniques, and maybe some interesting CTF challenge.
-
-I hope you will enjoy my writings!
+Hello, welcome to my blog, here I will post about stuff I discover including vulnerabilities and other things, along with anything that interests me. You can contact me on discord at @fern73
