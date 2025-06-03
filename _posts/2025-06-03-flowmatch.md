@@ -1,7 +1,7 @@
 ﻿---
 layout: post
 title: Flow Matching
-date: 2025-06-04
+date: 2025-06-03
 math: true
 categories: machine-learning
 description: Flow matching explained and implemented
