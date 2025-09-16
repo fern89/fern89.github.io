@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang=en>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+    <meta name="description" content="The Mamba SSM architecture, explained and implemented in Pytorch">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Mamba explained and implemented">
+<meta property="og:url" content="http://example.com/2025/05/07/mamba/index.html">
+<meta property="og:site_name" content="fern&#39;s blog">
+<meta property="og:description" content="The Mamba SSM architecture, explained and implemented in Pytorch">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="http://example.com/media/mamba/archi.png">
+<meta property="article:published_time" content="2025-05-07T05:11:41.000Z">
+<meta property="article:modified_time" content="2025-09-16T15:25:22.705Z">
+<meta property="article:author" content="fern">
+<meta property="article:tag" content="machine-learning">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/media/mamba/archi.png">
+    
+    
+      
+        
+          <link rel="shortcut icon" href="/images/favicon.ico">
+        
+      
+      
+        
+          <link rel="icon" type="image/png" href="/images/android-chrome-192x192.png" sizes="192x192">
+        
+      
+      
+        
+          <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+        
+      
+    
+    <!-- title -->
+    <title>Mamba explained and implemented</title>
+    <!-- async scripts -->
+    <!-- Google Analytics -->
+
+
+    <!-- Umami Analytics -->
+
+
+    <!-- styles -->
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <!-- persian styles -->
+    
+    <!-- rss -->
+    
+    
+	<!-- mathjax -->
+	
+		<script type="text/x-mathjax-config">
+		  MathJax.Hub.Config({
+			tex2jax: {
+			  skipTags: ['script', 'noscript', 'style', 'textarea', 'pre'],
+			  inlineMath: [['$','$']]
+			}
+		  });
+		</script>
+		<script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-MML-AM_CHTML' async></script>
+	
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
+<!-- hexo injector head_end end --><meta name="generator" content="Hexo 7.3.0"></head>
+
+<body class="max-width mx-auto px3 ltr">
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#" aria-label="Menu"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#" aria-label="Menu"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" aria-label="Top" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fa-solid fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/about/">About</a></li><!--
+     --><!--
+       --><li><a href="/archives/">Writing</a></li><!--
+     -->
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        <li><a class="icon" aria-label="Previous post" href="/2025/06/03/flowmatch/"><i class="fa-solid fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i></a></li>
+        
+        
+        <li><a class="icon" aria-label="Next post" href="/2024/12/19/verysecretstorage/"><i class="fa-solid fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" aria-label="Back to top" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" aria-label="Share post" href="#"><i class="fa-solid fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=http://example.com/2025/05/07/mamba/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=http://example.com/2025/05/07/mamba/&text=Mamba explained and implemented"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=http://example.com/2025/05/07/mamba/&title=Mamba explained and implemented"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=http://example.com/2025/05/07/mamba/&is_video=false&description=Mamba explained and implemented"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=Mamba explained and implemented&body=Check out this article: http://example.com/2025/05/07/mamba/"><i class="fa-solid fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=http://example.com/2025/05/07/mamba/&title=Mamba explained and implemented"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=http://example.com/2025/05/07/mamba/&title=Mamba explained and implemented"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=http://example.com/2025/05/07/mamba/&title=Mamba explained and implemented"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=http://example.com/2025/05/07/mamba/&title=Mamba explained and implemented"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=http://example.com/2025/05/07/mamba/&name=Mamba explained and implemented&description="><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=http://example.com/2025/05/07/mamba/&t=Mamba explained and implemented"><i class="fab fa-hacker-news " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    
+    
+      <div id="toc">
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#What-is-Mamba"><span class="toc-number">1.</span> <span class="toc-text">What is Mamba</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Implementing-Mamba-block"><span class="toc-number">2.</span> <span class="toc-text">Implementing Mamba block</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Initializing-the-model"><span class="toc-number">2.1.</span> <span class="toc-text">Initializing the model</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Implementing-architecture"><span class="toc-number">2.2.</span> <span class="toc-text">Implementing architecture</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Implementing-SSM"><span class="toc-number">2.3.</span> <span class="toc-text">Implementing SSM</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Implementing-scan"><span class="toc-number">2.4.</span> <span class="toc-text">Implementing scan</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Implementing-Mamba-network"><span class="toc-number">3.</span> <span class="toc-text">Implementing Mamba network</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Sequential-MNIST"><span class="toc-number">4.</span> <span class="toc-text">Sequential MNIST</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Appendix-cumsum-scan-vs-naive-scan"><span class="toc-number">5.</span> <span class="toc-text">Appendix: cumsum scan vs naive scan</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#References"><span class="toc-number">6.</span> <span class="toc-text">References</span></a></li></ol>
+      </div>
+    
+  </span>
+</div>
+
+    
+    <div class="content index py4 ">
+        
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle p-name" itemprop="name headline">
+        Mamba explained and implemented
+    </h1>
+
+
+
+    <div class="meta">
+      fern
+      
+    <div class="postdate">
+      
+        <time datetime="2025-05-07T05:11:41.000Z" class="dt-published" itemprop="datePublished">2025-05-07</time>
+        
+      
+    </div>
+
+
+      
+
+      
+    <div class="article-tag">
+        <i class="fa-solid fa-tag"></i>
+        <a class="p-category" href="/tags/machine-learning/" rel="tag">machine-learning</a>
+    </div>
+
+
+    </div>
+  </header>
+  
+
+  <div class="content e-content" itemprop="articleBody">
+    <p>Hello everyone, today I will be going through a Mamba implementation written in PyTorch. I will be basing it off <a target="_blank" rel="noopener" href="https://github.com/PeaBrane/mamba-tiny">this</a> excellent Github repository on a simple but still relatively performant implementation of Mamba. Note we will <strong>not</strong> cover any of the hardware-aware optimizations.</p>
+<h2 id="What-is-Mamba"><a href="#What-is-Mamba" class="headerlink" title="What is Mamba"></a>What is Mamba</h2><p>So first, introduction, what is Mamba? Mamba is basically SSM made good, introduced in <a target="_blank" rel="noopener" href="https://arxiv.org/pdf/2312.00752">this</a> paper. Then what is SSM? Simply put, </p>
+<p>$$<br>\dot{x} &#x3D; Ax + Bu\\<br>y &#x3D; Cx + Du<br>$$</p>
+<p>Where $x$ is the hidden state, $u$ represents the input at a timestep, and $y$ represents the output of the state space machine. $\dot{x}$ represents the derivative of $x$.</p>
+<p>We can discretize it to form,</p>
+<p>$$<br>x_{t} &#x3D; \bar{A}_{t}x_{t-1} + \bar{B}u_{t}\\<br>y_{t} &#x3D; Cx_{t} + Du<br>$$</p>
+<p>Where $\bar{A}$ and $\bar{B}$ are discretized versions of $A$ and $B$. We can derive $\bar{A}$ and $\bar{B}$ from $A$, $B$, and $\Delta$, all of which we learn.</p>
+<p>We can extend this to higher dimensions, by making $A, B, C, D$ matrices and $x, y, u$ vectors. In S4 and earlier SSMs, $A, B, C, D$ are independent of $u$. But in Mamba, they can be influenced by $u$. Reminds me of <a target="_blank" rel="noopener" href="https://arxiv.org/pdf/1609.09106">hypernetworks</a>, a concept proposed in 2016.</p>
+<h2 id="Implementing-Mamba-block"><a href="#Implementing-Mamba-block" class="headerlink" title="Implementing Mamba block"></a>Implementing Mamba block</h2><p>Anyways let us get started. First we will go through the architecture of Mamba.</p>
+<p><img src="/media/mamba/archi.png" alt="A screenshot of the Mamba architecture"></p>
+<p>It resembles the structure of a GLU unit. We up-project, split into 2 path, left branch we convolve (depthwise convolution here), sigmoid, then run the SSM. Right branch we just sigmoid. Then we multiply them, and down-project back into embedding dimension.</p>
+<h3 id="Initializing-the-model"><a href="#Initializing-the-model" class="headerlink" title="Initializing the model"></a>Initializing the model</h3><p>We create the Mamba block,</p>
+<figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">MambaBlock</span>(nn.Module):</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__init__</span>(<span class="params">self, embed_dim, inner_dim, state_dim, delta_rank</span>):</span><br><span class="line">        <span class="built_in">super</span>().__init__()</span><br><span class="line">        <span class="variable language_">self</span>.embed_dim = embed_dim</span><br><span class="line">        <span class="variable language_">self</span>.inner_dim = inner_dim</span><br><span class="line">        <span class="variable language_">self</span>.state_dim = state_dim</span><br><span class="line">        <span class="variable language_">self</span>.delta_rank = delta_rank</span><br><span class="line"></span><br><span class="line">        <span class="variable language_">self</span>.in_proj = nn.Linear(embed_dim, inner_dim * <span class="number">2</span>, bias=<span class="literal">False</span>)</span><br></pre></td></tr></table></figure>
+<p>The up-projection is done without biases, to form the left and right branch. Now we create convolution,</p>
+<figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable language_">self</span>.conv1d = nn.Conv1d(</span><br><span class="line">    in_channels=inner_dim,</span><br><span class="line">    out_channels=inner_dim,</span><br><span class="line">    kernel_size=<span class="number">4</span>,</span><br><span class="line">    groups=inner_dim,</span><br><span class="line">    padding=<span class="number">3</span>,</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+<p>You may find the kernel size and paddings a bit odd. However, this is normal, as it is a <strong>causal</strong> convolution. Try to visualize the first output of the convolution, it will consist of 3 pads and 1 token. Crucially, it does not contain future tokens. Basically prevents the model from cheating by looking at the next tokens using the convolution. Later on, we will only take the first L tokens of the convolution output, where L is the sequence length.</p>
+<p>Now we want to form delta, B, and C. We will just make 1 linear layer, and split it later for efficiency.</p>
+<figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable language_">self</span>.x_proj = nn.Linear(inner_dim, delta_rank + state_dim * <span class="number">2</span>, bias=<span class="literal">False</span>)</span><br><span class="line"><span class="variable language_">self</span>.dt_proj = nn.Linear(delta_rank, inner_dim, bias=<span class="literal">True</span>)</span><br></pre></td></tr></table></figure>
+<p>Note how delta is formed in 2 cycles. This is because we want to lower the rank of the delta matrix. Why? In the paper, under interpretation of delta, authors state,</p>
+<blockquote>
+<p>Δ controls the balance between how much to focus or ignore the current input xt</p>
+</blockquote>
+<p>Authors do not state this, but I suspect the lowering of rank allows for each token to be forced to decide how much to express itself in very few (say 1-2) scalars, which makes logical sense, as the vector of each token should be treated as a whole embedding, not piecewise.</p>
+<p>We then initialize the weights such that delta stays between 0.1 and 0.001, as they do in S4,</p>
+<figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># Initialize special dt projection to preserve variance at initialization</span></span><br><span class="line">dt_init_std = <span class="variable language_">self</span>.delta_rank**-<span class="number">0.5</span></span><br><span class="line">nn.init.uniform_(<span class="variable language_">self</span>.dt_proj.weight, -dt_init_std, dt_init_std)</span><br><span class="line"></span><br><span class="line"><span class="comment"># Initialize dt bias so that F.softplus(dt_bias) is between dt_min and dt_max</span></span><br><span class="line">dt = torch.exp(</span><br><span class="line">    torch.rand(inner_dim) * (math.log(<span class="number">0.1</span>) - math.log(<span class="number">0.001</span>))</span><br><span class="line">    + math.log(<span class="number">0.001</span>)</span><br><span class="line">).clamp(<span class="built_in">min</span>=<span class="number">1e-4</span>)</span><br><span class="line"><span class="comment"># Inverse of softplus: https://github.com/pytorch/pytorch/issues/72759</span></span><br><span class="line">inv_dt = dt + torch.log(-torch.expm1(-dt))</span><br><span class="line"><span class="keyword">with</span> torch.no_grad():</span><br><span class="line">    <span class="variable language_">self</span>.dt_proj.bias.copy_(inv_dt)</span><br><span class="line"><span class="variable language_">self</span>.dt_proj.bias._no_reinit = <span class="literal">True</span></span><br></pre></td></tr></table></figure>
+<p>Now, we initialize the A matrix,</p>
+<figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">A = torch.arange(<span class="number">1</span>, state_dim + <span class="number">1</span>).unsqueeze(<span class="number">0</span>).repeat(inner_dim, <span class="number">1</span>)</span><br><span class="line"><span class="variable language_">self</span>.A_log = nn.Parameter(torch.log(A))</span><br></pre></td></tr></table></figure>
+<p>We initialize it such that A looks something like this,</p>
+<figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">tensor([[<span class="number">1.</span>, <span class="number">2.</span>, <span class="number">3.</span>],</span><br><span class="line">        [<span class="number">1.</span>, <span class="number">2.</span>, <span class="number">3.</span>],</span><br><span class="line">        ...</span><br><span class="line">        [<span class="number">1.</span>, <span class="number">2.</span>, <span class="number">3.</span>]])</span><br></pre></td></tr></table></figure>
+<p>This is in accordance with the initialization used in S4D-real.</p>
+<p>Finally, finish up with D and the down-projection,</p>
+<figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable language_">self</span>.D = nn.Parameter(torch.ones(inner_dim))</span><br><span class="line"><span class="variable language_">self</span>.out_proj = nn.Linear(inner_dim, embed_dim, bias=<span class="literal">False</span>)</span><br></pre></td></tr></table></figure>
+
+<p>Great! We are finally done with initializations. Now, we will implement the logic.</p>
+<h3 id="Implementing-architecture"><a href="#Implementing-architecture" class="headerlink" title="Implementing architecture"></a>Implementing architecture</h3><p>Ok so first we will do up the basic architecture as shown earlier,</p>
+<figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">forward</span>(<span class="params">self, x</span>):</span><br><span class="line">    (b, l, d) = x.shape</span><br><span class="line"></span><br><span class="line">    x_and_res = <span class="variable language_">self</span>.in_proj(x)  <span class="comment"># shape (b, l, 2 * d_in)</span></span><br><span class="line">    (x, res) = x_and_res.split(split_size=[<span class="variable language_">self</span>.inner_dim, <span class="variable language_">self</span>.inner_dim], dim=-<span class="number">1</span>)</span><br><span class="line">    x = x.transpose(-<span class="number">1</span>, -<span class="number">2</span>)</span><br><span class="line">    x = <span class="variable language_">self</span>.conv1d(x)[:, :, :l]</span><br><span class="line">    x = x.transpose(-<span class="number">1</span>, -<span class="number">2</span>)</span><br><span class="line">    x = F.silu(x)</span><br><span class="line">    y = <span class="variable language_">self</span>.ssm(x)</span><br><span class="line">    y = y * F.silu(res)</span><br><span class="line">    <span class="keyword">return</span> <span class="variable language_">self</span>.out_proj(y)</span><br></pre></td></tr></table></figure>
+<p>This is basically a 1:1 copy of the architecture, is quite trivial. Now on to the hard part, the SSM.</p>
+<h3 id="Implementing-SSM"><a href="#Implementing-SSM" class="headerlink" title="Implementing SSM"></a>Implementing SSM</h3><p>We start off with taking the negative exponential of A,</p>
+<figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">(d_in, n) = <span class="variable language_">self</span>.A_log.shape</span><br><span class="line">A = -torch.exp(<span class="variable language_">self</span>.A_log.<span class="built_in">float</span>())</span><br><span class="line">D = <span class="variable language_">self</span>.D.<span class="built_in">float</span>()</span><br></pre></td></tr></table></figure>
+
+<p>We take exponential as we initialized it with a log, and negative as that is what is recommended by the S4D paper (it is due to something related to HiPPO theory I believe, but am not too sure).</p>
+<p>Now we up-project x, and obtain B, C, and delta.</p>
+<figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">x_dbl = <span class="variable language_">self</span>.x_proj(x)  <span class="comment"># (b, l, dt_rank + 2*n)</span></span><br><span class="line"><span class="comment"># delta: (b, l, dt_rank). B, C: (b, l, n)</span></span><br><span class="line">(delta, B, C) = x_dbl.split(split_size=[<span class="variable language_">self</span>.delta_rank, n, n], dim=-<span class="number">1</span>)</span><br><span class="line">delta = F.softplus(<span class="variable language_">self</span>.dt_proj(delta))  <span class="comment"># (b, l, d_in)</span></span><br></pre></td></tr></table></figure>
+
+<p>Finally, we run the scan of the SSM, this is basically the recurrent part of it,</p>
+<figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">return</span> selective_scan(x, delta, A, B, C, D)</span><br></pre></td></tr></table></figure>
+
+<p>Now how do we implement this scan?</p>
+<h3 id="Implementing-scan"><a href="#Implementing-scan" class="headerlink" title="Implementing scan"></a>Implementing scan</h3><p>This scan is to run the equation,</p>
+<p>$$<br>x_{t} &#x3D; \bar{A}x_{t-1} + \bar{B}u_{t}\\<br>y_{t} &#x3D; Cx_{t} + Du<br>$$</p>
+<p>over all the <code>u</code> steps.</p>
+<p>We create the <code>dA</code> tensor, by multiplying <code>dt</code> with <code>A</code>. We create a $\bar{A}$ and $\bar{B}$ tensor for each <code>u</code> step, and calculate the $\bar{B}u_{t}$. Then, we clamp <code>dA</code> for numerical stability.</p>
+<figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">selective_scan</span>(<span class="params">u, dt, A, B, C, D</span>):</span><br><span class="line">    dA = torch.einsum(<span class="string">&#x27;bld,dn-&gt;bldn&#x27;</span>, dt, A)</span><br><span class="line">    dB_u = torch.einsum(<span class="string">&#x27;bld,bld,bln-&gt;bldn&#x27;</span>, dt, u, B)</span><br><span class="line">    dA = dA.clamp(<span class="built_in">min</span>=-<span class="number">20</span>)</span><br></pre></td></tr></table></figure>
+
+<p>And as $\bar{A}$ is not constant over time, we need to solve for,</p>
+<p>$$<br>\begin{bmatrix}<br>\bar{A}_{0}\\<br>\bar{A}_{1}\bar{A}_{0}\\<br>…\\<br>\bar{A}_{t}\bar{A}_{t-1} … \bar{A}_{0}<br>\end{bmatrix}<br>$$</p>
+<p>We do this like this,</p>
+<figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">padding = (<span class="number">0</span>,  <span class="number">0</span>,  <span class="number">0</span>,  <span class="number">0</span>,  <span class="number">1</span>,  <span class="number">0</span>)</span><br><span class="line">dA_cumsum = F.pad(dA[:,  <span class="number">1</span>:], padding).cumsum(<span class="number">1</span>).exp()</span><br></pre></td></tr></table></figure>
+<p>We zero out the first embedding, then take a cumulative sum then exponential over this. By laws of exponents, this would result in the additions becoming multiplications effectively. This allows us to obtain the desired matrix!</p>
+<p>Now the next few lines are the most confusing, so here is the code first, then I will explain,</p>
+<figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">x = dB_u / (dA_cumsum + <span class="number">1e-12</span>)</span><br><span class="line">x = x.cumsum(<span class="number">1</span>) * dA_cumsum</span><br></pre></td></tr></table></figure>
+<p>So after the first line,</p>
+<p>$$<br>x &#x3D; [\frac{\bar{B}u_{0}}{\bar{A}_{0}}, \frac{\bar{B}u_{1}}{\bar{A}_{0}\bar{A}_{1}}, …, \frac{\bar{B}u_{t}}{\bar{A}_{0}\bar{A}_{1}…\bar{A}_{t}}]<br>$$</p>
+<p>Then we cumsum,</p>
+<p>$$<br>x &#x3D; [\frac{\bar{B}u_{0}}{\bar{A}_{0}}, \frac{\bar{B}u_{0}}{\bar{A}_{0}} + \frac{\bar{B}u_{1}}{\bar{A}_{0}\bar{A}_{1}}, …, \frac{\bar{B}u_{0}}{\bar{A}_{0}} +…+\frac{\bar{B}u_{t}}{\bar{A}_{0}\bar{A}_{1}…\bar{A}_{t}}]<br>$$</p>
+<p>And remember, <code>dA_cumsum</code> has,</p>
+<p>$$<br>[\bar{A}_{0}, \bar{A}_{0}\bar{A}_{1}, …, \bar{A}_{0}\bar{A}_{1}…\bar{A}_{t}]<br>$$</p>
+<p>And when we multiply, x becomes,</p>
+<p>$$<br>x &#x3D; [\bar{B}u_{0}, \bar{A}_{1}\bar{B}u_{0} + \bar{B}u_{1}, …, (\bar{A}_{t}…\bar{A}_{1})\bar{B}u_{0} + … + \bar{B}u_{t}]<br>$$</p>
+<p>This is precisely what we would have gotten had we used a naive scan algorithm! Except that, cumsum is incredibly fast, as we can use the <a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/Prefix_sum">prefix sum algorithm</a>, which is super parallelizable, and we can do this very fast on a GPU! This very parallelizability, is exactly why Mamba and related SSMs are so popular now, compared to older generation RNNs like LSTM and GRU. We get great training speeds.</p>
+<p>The hard part is now over, finally, we solve for y, and return $Cx_{t} + Du$,</p>
+<figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">y = torch.einsum(<span class="string">&#x27;bldn,bln-&gt;bld&#x27;</span>, x, C)</span><br><span class="line"><span class="keyword">return</span> y + u * D</span><br></pre></td></tr></table></figure>
+
+<p>And after all this work, we have finally implemented a Mamba block! Now, it is time to put it all together, and create a Mamba network!</p>
+<h2 id="Implementing-Mamba-network"><a href="#Implementing-Mamba-network" class="headerlink" title="Implementing Mamba network"></a>Implementing Mamba network</h2><p>For this, we will just do a classic transformer-like architecture. We will be doing sets of <code>x = x + mamba(norm(x))</code>. Then, we will take the final output of the model, and calculate loss for that. We will be doing this for Sequential MNIST classification, in which we feed the model a picture from MNIST in a stream.</p>
+<figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Model</span>(nn.Module):</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__init__</span>(<span class="params">self, embed_dim, inner_dim, state_dim, n_layers</span>):</span><br><span class="line">        <span class="built_in">super</span>().__init__()</span><br><span class="line">        <span class="variable language_">self</span>.mambas = nn.ModuleList([])</span><br><span class="line">        <span class="variable language_">self</span>.embeds = nn.Linear(<span class="number">1</span>, embed_dim)</span><br><span class="line">        <span class="variable language_">self</span>.outs = nn.Linear(embed_dim, <span class="number">10</span>)</span><br><span class="line">        <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(n_layers):</span><br><span class="line">            <span class="variable language_">self</span>.mambas.append(</span><br><span class="line">                nn.Sequential(</span><br><span class="line">                    nn.modules.normalization.RMSNorm(embed_dim),</span><br><span class="line">                    MambaBlock(embed_dim, inner_dim, state_dim, <span class="number">1</span>)</span><br><span class="line">                )</span><br><span class="line">            )</span><br><span class="line">        <span class="variable language_">self</span>.final_norm = nn.modules.normalization.RMSNorm(embed_dim)</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">forward</span>(<span class="params">self, x</span>):</span><br><span class="line">        x = x.flatten(<span class="number">1</span>).unsqueeze(-<span class="number">1</span>)</span><br><span class="line">        x = <span class="variable language_">self</span>.embeds(x)</span><br><span class="line">        <span class="keyword">for</span> mamba <span class="keyword">in</span> <span class="variable language_">self</span>.mambas:</span><br><span class="line">            x = x + mamba(x)</span><br><span class="line">        x = x[:, -<span class="number">1</span>, :]</span><br><span class="line">        x = <span class="variable language_">self</span>.final_norm(x)</span><br><span class="line">        x = <span class="variable language_">self</span>.outs(x)</span><br><span class="line">        <span class="keyword">return</span> x</span><br><span class="line"><span class="comment"># we will use a small model for demo</span></span><br><span class="line">model = Model(embed_dim = <span class="number">8</span>, state_dim = <span class="number">128</span>, inner_dim = <span class="number">32</span>, n_layers = <span class="number">4</span>).cuda()</span><br></pre></td></tr></table></figure>
+
+<h2 id="Sequential-MNIST"><a href="#Sequential-MNIST" class="headerlink" title="Sequential MNIST"></a>Sequential MNIST</h2><p>We will train the model for sequential MNIST, we resize to 10x10 for easier training,</p>
+<figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">transform = transforms.Compose([</span><br><span class="line">    transforms.ToTensor(),</span><br><span class="line">    transforms.Resize((<span class="number">10</span>,<span class="number">10</span>)),</span><br><span class="line">    transforms.Normalize((<span class="number">0.1307</span>,), (<span class="number">0.3081</span>,))</span><br><span class="line">])</span><br><span class="line">train_dataset = datasets.MNIST(root=<span class="string">&#x27;./data&#x27;</span>, train=<span class="literal">True</span>, download=<span class="literal">True</span>, transform=transform)</span><br><span class="line">test_dataset  = datasets.MNIST(root=<span class="string">&#x27;./data&#x27;</span>, train=<span class="literal">False</span>, download=<span class="literal">True</span>, transform=transform)</span><br><span class="line"></span><br><span class="line">train_loader  = torch.utils.data.DataLoader(dataset=train_dataset, batch_size=<span class="number">256</span>, shuffle=<span class="literal">True</span>)</span><br><span class="line">test_loader   = torch.utils.data.DataLoader(dataset=test_dataset, batch_size=<span class="number">1024</span>, shuffle=<span class="literal">False</span>)</span><br></pre></td></tr></table></figure>
+
+<p>Start training the model on 3e-3 for Adam,</p>
+<figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">criterion = nn.CrossEntropyLoss()</span><br><span class="line">optimizer = optim.Adam(model.parameters(), lr = <span class="number">3e-3</span>)</span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">10</span>):</span><br><span class="line">    <span class="keyword">for</span> j, (inp, trg) <span class="keyword">in</span> <span class="built_in">enumerate</span>(train_loader):</span><br><span class="line">        optimizer.zero_grad()</span><br><span class="line">        outs = model(inp.cuda())</span><br><span class="line">        loss = criterion(outs, trg.cuda())</span><br><span class="line">        <span class="keyword">if</span> j % <span class="number">10</span> == <span class="number">0</span>:</span><br><span class="line">            <span class="built_in">print</span>(<span class="string">&quot;loss:&quot;</span>, loss.item())</span><br><span class="line">            acc = (outs.cpu().argmax(dim = -<span class="number">1</span>) == trg).<span class="built_in">sum</span>() / <span class="built_in">len</span>(trg)</span><br><span class="line">            <span class="built_in">print</span>(<span class="string">&quot;acc:&quot;</span>, acc.item())</span><br><span class="line">        loss.backward()</span><br><span class="line">        optimizer.step()</span><br></pre></td></tr></table></figure>
+
+<p>Finally, evaluate the model,</p>
+<figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">total = <span class="number">0</span></span><br><span class="line">correct = <span class="number">0</span></span><br><span class="line"><span class="keyword">with</span> torch.no_grad():</span><br><span class="line">    <span class="keyword">for</span> _, (inp, trg) <span class="keyword">in</span> <span class="built_in">enumerate</span>(test_loader):</span><br><span class="line">        outs = model(inp.cuda())</span><br><span class="line">        correct += (outs.cpu().argmax(dim = -<span class="number">1</span>) == trg).<span class="built_in">sum</span>()</span><br><span class="line">        total += <span class="built_in">len</span>(trg)</span><br><span class="line"><span class="built_in">print</span>(correct / total)</span><br></pre></td></tr></table></figure>
+<p>And that’s it! Congratulations, if you followed along, you have now trained a Mamba model for the sequential MNIST task. I got a final test accuracy of 92.24%, but I did not really try too hard.</p>
+<p>All code is available <a target="_blank" rel="noopener" href="https://gist.github.com/fern89/8817c92df4090a3d179213c151c2cc2f">here</a>. But it is mostly a refactored version of <a target="_blank" rel="noopener" href="https://github.com/PeaBrane/mamba-tiny">mamba-tiny</a>, which you should also check out.</p>
+<h2 id="Appendix-cumsum-scan-vs-naive-scan"><a href="#Appendix-cumsum-scan-vs-naive-scan" class="headerlink" title="Appendix: cumsum scan vs naive scan"></a>Appendix: cumsum scan vs naive scan</h2><p>If you were wondering just how much of a speed boost the parallelizable cumsum scan gave over a naive scan, I wrote a code to test just that,</p>
+<figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> torch</span><br><span class="line"><span class="keyword">from</span> torch.nn <span class="keyword">import</span> functional <span class="keyword">as</span> F</span><br><span class="line"><span class="keyword">from</span> einops <span class="keyword">import</span> rearrange, repeat, einsum</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">naive_selective_scan</span>(<span class="params">u, delta, A, B, C, D</span>):</span><br><span class="line">    (b, l, d_in) = u.shape</span><br><span class="line">    n = A.shape[<span class="number">1</span>]</span><br><span class="line">    padding =  (<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">0</span>)</span><br><span class="line">    dA = einsum(delta, A, <span class="string">&#x27;b l d_in, d_in n -&gt; b l d_in n&#x27;</span>)</span><br><span class="line">    dA = dA.clamp(<span class="built_in">min</span>=-<span class="number">20</span>)</span><br><span class="line">    dA = F.pad(dA[:, <span class="number">1</span>:], padding)</span><br><span class="line">    deltaA = torch.exp(dA)</span><br><span class="line">    deltaB_u = einsum(delta, B, u, <span class="string">&#x27;b l d_in, b l n, b l d_in -&gt; b l d_in n&#x27;</span>)</span><br><span class="line">    </span><br><span class="line">    x = torch.zeros((b, d_in, n), device=deltaA.device)</span><br><span class="line">    ys = []    </span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(l):</span><br><span class="line">        x = deltaA[:, i] * x + deltaB_u[:, i]</span><br><span class="line">        y = einsum(x, C[:, i, :], <span class="string">&#x27;b d_in n, b n -&gt; b d_in&#x27;</span>)</span><br><span class="line">        ys.append(y)</span><br><span class="line">    y = torch.stack(ys, dim=<span class="number">1</span>)  <span class="comment"># shape (b, l, d_in)</span></span><br><span class="line">    </span><br><span class="line">    y = y + u * D</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> y</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">selective_scan</span>(<span class="params">u, dt, A, B, C, D</span>):</span><br><span class="line">    dA = torch.einsum(<span class="string">&#x27;bld,dn-&gt;bldn&#x27;</span>, dt, A)</span><br><span class="line">    dB_u = torch.einsum(<span class="string">&#x27;bld,bld,bln-&gt;bldn&#x27;</span>, dt, u, B)</span><br><span class="line">    dA = dA.clamp(<span class="built_in">min</span>=-<span class="number">20</span>)</span><br><span class="line">    </span><br><span class="line">    padding =  (<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">0</span>)</span><br><span class="line">              </span><br><span class="line">    dA_cumsum = F.pad(dA[:, <span class="number">1</span>:], padding).cumsum(<span class="number">1</span>).exp()</span><br><span class="line">    x = dB_u / (dA_cumsum + <span class="number">1e-15</span>)</span><br><span class="line">    x = x.cumsum(<span class="number">1</span>) * dA_cumsum</span><br><span class="line">    y = torch.einsum(<span class="string">&#x27;bldn,bln-&gt;bld&#x27;</span>, x, C)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> y + u * D</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">u = -<span class="number">1</span> + <span class="number">2</span> * torch.rand(<span class="number">2</span>, <span class="number">10000</span>, <span class="number">32</span>).cuda()</span><br><span class="line">dt = torch.ones(<span class="number">2</span>, <span class="number">10000</span>, <span class="number">32</span>).cuda()</span><br><span class="line">A =  -torch.rand(<span class="number">32</span>, <span class="number">16</span>).cuda()</span><br><span class="line">B = torch.rand(<span class="number">2</span>, <span class="number">10000</span>, <span class="number">16</span>).cuda()</span><br><span class="line">C = torch.rand(<span class="number">2</span>, <span class="number">10000</span>, <span class="number">16</span>).cuda()</span><br><span class="line">D = torch.rand(<span class="number">32</span>).cuda()</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> time</span><br><span class="line">naive_selective_scan(u, dt, A, B, C, D)</span><br><span class="line">t0 = time.time()</span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">5</span>):</span><br><span class="line">    naive_selective_scan(u, dt, A, B, C, D)</span><br><span class="line"><span class="built_in">print</span>(<span class="string">&quot;naive:&quot;</span>, time.time() - t0)</span><br><span class="line"></span><br><span class="line">selective_scan(u, dt, A, B, C, D)</span><br><span class="line">t0 = time.time()</span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">5</span>):</span><br><span class="line">    selective_scan(u, dt, A, B, C, D)</span><br><span class="line"><span class="built_in">print</span>(<span class="string">&quot;cumsum:&quot;</span>, time.time() - t0)</span><br></pre></td></tr></table></figure>
+
+<p>Output:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">naive: 6.160594701766968</span><br><span class="line">cumsum: 0.00433659553527832</span><br></pre></td></tr></table></figure>
+<p>That’s over 1000x faster for the cumsum version! Note that the results may differ (from what I see it occurs between timestep 30-40 typically) between versions as the cumsum version does have an epsilon term for numerical stability, but that small number also causes butterfly effect down the road. In any case, this insane speedup, especially for long sequences, makes such small errors more than reasonable.</p>
+<h2 id="References"><a href="#References" class="headerlink" title="References"></a>References</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://github.com/PeaBrane/mamba-tiny">https://github.com/PeaBrane/mamba-tiny</a> - Mamba tiny, what I mainly used for this post</li>
+<li><a target="_blank" rel="noopener" href="https://github.com/johnma2006/mamba-minimal">https://github.com/johnma2006/mamba-minimal</a> - Mamba minimal, mamba tiny without the fast scan</li>
+<li><a target="_blank" rel="noopener" href="https://github.com/state-spaces/mamba/">https://github.com/state-spaces/mamba/</a> - the original Mamba implementation</li>
+<li><a target="_blank" rel="noopener" href="https://arxiv.org/pdf/2312.00752">https://arxiv.org/pdf/2312.00752</a> - Mamba paper</li>
+<li><a target="_blank" rel="noopener" href="https://arxiv.org/pdf/2206.11893">https://arxiv.org/pdf/2206.11893</a> - S4D paper</li>
+<li><a target="_blank" rel="noopener" href="https://arxiv.org/pdf/2111.00396">https://arxiv.org/pdf/2111.00396</a> - S4 paper</li>
+<li><a target="_blank" rel="noopener" href="https://arxiv.org/pdf/2008.07669">https://arxiv.org/pdf/2008.07669</a> - HiPPO paper</li>
+<li><a target="_blank" rel="noopener" href="https://arxiv.org/pdf/1609.09106">https://arxiv.org/pdf/1609.09106</a> - Hypernetworks paper</li>
+<li><a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/Prefix_sum">https://en.wikipedia.org/wiki/Prefix_sum</a> - Prefix sum algorithm</li>
+</ul>
+
+  </div>
+</article>
+
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+        
+          <li><a href="/">Home</a></li>
+        
+          <li><a href="/about/">About</a></li>
+        
+          <li><a href="/archives/">Writing</a></li>
+        
+      </ul>
+    </div>
+
+    
+    
+      <div id="toc-footer" style="display: none">
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#What-is-Mamba"><span class="toc-number">1.</span> <span class="toc-text">What is Mamba</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Implementing-Mamba-block"><span class="toc-number">2.</span> <span class="toc-text">Implementing Mamba block</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Initializing-the-model"><span class="toc-number">2.1.</span> <span class="toc-text">Initializing the model</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Implementing-architecture"><span class="toc-number">2.2.</span> <span class="toc-text">Implementing architecture</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Implementing-SSM"><span class="toc-number">2.3.</span> <span class="toc-text">Implementing SSM</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Implementing-scan"><span class="toc-number">2.4.</span> <span class="toc-text">Implementing scan</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Implementing-Mamba-network"><span class="toc-number">3.</span> <span class="toc-text">Implementing Mamba network</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Sequential-MNIST"><span class="toc-number">4.</span> <span class="toc-text">Sequential MNIST</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Appendix-cumsum-scan-vs-naive-scan"><span class="toc-number">5.</span> <span class="toc-text">Appendix: cumsum scan vs naive scan</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#References"><span class="toc-number">6.</span> <span class="toc-text">References</span></a></li></ol>
+      </div>
+    
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=http://example.com/2025/05/07/mamba/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=http://example.com/2025/05/07/mamba/&text=Mamba explained and implemented"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=http://example.com/2025/05/07/mamba/&title=Mamba explained and implemented"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=http://example.com/2025/05/07/mamba/&is_video=false&description=Mamba explained and implemented"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=Mamba explained and implemented&body=Check out this article: http://example.com/2025/05/07/mamba/"><i class="fa-solid fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=http://example.com/2025/05/07/mamba/&title=Mamba explained and implemented"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=http://example.com/2025/05/07/mamba/&title=Mamba explained and implemented"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=http://example.com/2025/05/07/mamba/&title=Mamba explained and implemented"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=http://example.com/2025/05/07/mamba/&title=Mamba explained and implemented"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=http://example.com/2025/05/07/mamba/&name=Mamba explained and implemented&description="><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=http://example.com/2025/05/07/mamba/&t=Mamba explained and implemented"><i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fa-solid fa-bars fa-lg" aria-hidden="true"></i> Menu</a>
+        
+          <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fa-solid fa-list fa-lg" aria-hidden="true"></i> TOC</a>
+        
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fa-solid fa-share-alt fa-lg" aria-hidden="true"></i> Share</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy;
+    
+    
+    2024-2025
+    fern
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/about/">About</a></li><!--
+     --><!--
+       --><li><a href="/archives/">Writing</a></li><!--
+     -->
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+
+
+
+  <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" onload="this.onload=null;this.rel='stylesheet'"/>
+
+
+    <!-- jquery -->
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" crossorigin="anonymous"></script>
+
+
+
+
+<!-- clipboard -->
+
+  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.7/clipboard.min.js" crossorigin="anonymous"></script>
+  
+  <script type="text/javascript">
+  $(function() {
+    // copy-btn HTML
+    var btn = "<span class=\"btn-copy tooltipped tooltipped-sw\" aria-label=\"Copy to clipboard!\">";
+    btn += '<i class="fa-regular fa-clone"></i>';
+    btn += '</span>';
+    // mount it!
+    $(".highlight table").before(btn);
+    var clip = new ClipboardJS('.btn-copy', {
+      text: function(trigger) {
+        return Array.from(trigger.nextElementSibling.querySelectorAll('.code')).reduce((str,it)=>str+it.innerText+'\n','')
+      }
+    });
+    clip.on('success', function(e) {
+      e.trigger.setAttribute('aria-label', "Copied!");
+      e.clearSelection();
+    })
+  })
+  </script>
+
+
+<script src="/js/main.js"></script>
+
+<!-- search -->
+
+<!-- Baidu Analytics -->
+
+<!-- Cloudflare Analytics -->
+
+  <script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "e2c0a56b5d4d466baf300058fd41c3e8"}'></script>
+
+<!-- Disqus Comments -->
+
+<!-- utterances Comments -->
+
+</body>
+</html>

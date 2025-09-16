@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang=en>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+    <meta name="description" content="Flow matching explained and implemented">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Flow Matching">
+<meta property="og:url" content="http://example.com/2025/06/03/flowmatch/index.html">
+<meta property="og:site_name" content="fern&#39;s blog">
+<meta property="og:description" content="Flow matching explained and implemented">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="http://example.com/media/flowmatch/gens.png">
+<meta property="og:image" content="http://example.com/media/flowmatch/unet.jpg">
+<meta property="og:image" content="http://example.com/media/flowmatch/gens.png">
+<meta property="article:published_time" content="2025-06-03T05:26:27.000Z">
+<meta property="article:modified_time" content="2025-09-16T15:27:52.242Z">
+<meta property="article:author" content="fern">
+<meta property="article:tag" content="machine-learning">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/media/flowmatch/gens.png">
+    
+    
+      
+        
+          <link rel="shortcut icon" href="/images/favicon.ico">
+        
+      
+      
+        
+          <link rel="icon" type="image/png" href="/images/android-chrome-192x192.png" sizes="192x192">
+        
+      
+      
+        
+          <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+        
+      
+    
+    <!-- title -->
+    <title>Flow Matching</title>
+    <!-- async scripts -->
+    <!-- Google Analytics -->
+
+
+    <!-- Umami Analytics -->
+
+
+    <!-- styles -->
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <!-- persian styles -->
+    
+    <!-- rss -->
+    
+    
+	<!-- mathjax -->
+	
+		<script type="text/x-mathjax-config">
+		  MathJax.Hub.Config({
+			tex2jax: {
+			  skipTags: ['script', 'noscript', 'style', 'textarea', 'pre'],
+			  inlineMath: [['$','$']]
+			}
+		  });
+		</script>
+		<script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-MML-AM_CHTML' async></script>
+	
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
+<!-- hexo injector head_end end --><meta name="generator" content="Hexo 7.3.0"></head>
+
+<body class="max-width mx-auto px3 ltr">
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#" aria-label="Menu"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#" aria-label="Menu"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" aria-label="Top" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fa-solid fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/about/">About</a></li><!--
+     --><!--
+       --><li><a href="/archives/">Writing</a></li><!--
+     -->
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        <li><a class="icon" aria-label="Previous post" href="/2025/09/16/inductive-bias/"><i class="fa-solid fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i></a></li>
+        
+        
+        <li><a class="icon" aria-label="Next post" href="/2025/05/07/mamba/"><i class="fa-solid fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" aria-label="Back to top" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" aria-label="Share post" href="#"><i class="fa-solid fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=http://example.com/2025/06/03/flowmatch/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=http://example.com/2025/06/03/flowmatch/&text=Flow Matching"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=http://example.com/2025/06/03/flowmatch/&title=Flow Matching"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=http://example.com/2025/06/03/flowmatch/&is_video=false&description=Flow Matching"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=Flow Matching&body=Check out this article: http://example.com/2025/06/03/flowmatch/"><i class="fa-solid fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=http://example.com/2025/06/03/flowmatch/&title=Flow Matching"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=http://example.com/2025/06/03/flowmatch/&title=Flow Matching"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=http://example.com/2025/06/03/flowmatch/&title=Flow Matching"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=http://example.com/2025/06/03/flowmatch/&title=Flow Matching"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=http://example.com/2025/06/03/flowmatch/&name=Flow Matching&description="><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=http://example.com/2025/06/03/flowmatch/&t=Flow Matching"><i class="fab fa-hacker-news " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    
+    
+      <div id="toc">
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Literature-Review"><span class="toc-number">1.</span> <span class="toc-text">Literature Review</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Math"><span class="toc-number">2.</span> <span class="toc-text">Math</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Architecture"><span class="toc-number">3.</span> <span class="toc-text">Architecture</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Time-embedding"><span class="toc-number">3.1.</span> <span class="toc-text">Time embedding</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Downsample"><span class="toc-number">3.2.</span> <span class="toc-text">Downsample</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Middle-block"><span class="toc-number">3.3.</span> <span class="toc-text">Middle block</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Upsample"><span class="toc-number">3.4.</span> <span class="toc-text">Upsample</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#U-net"><span class="toc-number">3.5.</span> <span class="toc-text">U-net</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Training"><span class="toc-number">4.</span> <span class="toc-text">Training</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#References"><span class="toc-number">5.</span> <span class="toc-text">References</span></a></li></ol>
+      </div>
+    
+  </span>
+</div>
+
+    
+    <div class="content index py4 ">
+        
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle p-name" itemprop="name headline">
+        Flow Matching
+    </h1>
+
+
+
+    <div class="meta">
+      fern
+      
+    <div class="postdate">
+      
+        <time datetime="2025-06-03T05:26:27.000Z" class="dt-published" itemprop="datePublished">2025-06-03</time>
+        
+      
+    </div>
+
+
+      
+
+      
+    <div class="article-tag">
+        <i class="fa-solid fa-tag"></i>
+        <a class="p-category" href="/tags/machine-learning/" rel="tag">machine-learning</a>
+    </div>
+
+
+    </div>
+  </header>
+  
+
+  <div class="content e-content" itemprop="articleBody">
+    <p>Hello all, today I will cover flow matching. Flow matching is a (somewhat) novel technique to image generation, that seems to outperform all existing techniques. It is the backbone of many modern models like Stable Diffusion 3. So we will start off with the beloved Literature Review, and look through existing technique. Full code is available <a target="_blank" rel="noopener" href="https://gist.github.com/fern89/547a153084d0ad6a438bab7e4046095f">here</a></p>
+<p><img src="/media/flowmatch/gens.png" alt="Image of some clothes generated by the model"></p>
+<h2 id="Literature-Review"><a href="#Literature-Review" class="headerlink" title="Literature Review"></a>Literature Review</h2><p>So in the existing pools of techniques, we have these:</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>VAE</th>
+<th>GAN</th>
+<th>VAE-GAN</th>
+<th>Diffusion</th>
+<th>Flow matching</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Training</td>
+<td>Decent speed, albeit a bit wasteful - oftentimes the encoder is thrown away</td>
+<td>Painful. Model collapse happens reasonably often.</td>
+<td>Model collapse quite unlikely, but again, you throw away encoder and discriminator usually.</td>
+<td>Pretty decent speeds, but there are many ways to screw up due to high amounts of math</td>
+<td>Very good, trains very fast, and simple to implement</td>
+</tr>
+<tr>
+<td>Inference speed</td>
+<td>Good - single pass</td>
+<td>Good</td>
+<td>Good</td>
+<td>Poor - often needs many passes to generate decent quality</td>
+<td>Mid - Faster than diffusion, slower than single pass models</td>
+</tr>
+<tr>
+<td>Quality</td>
+<td>Trash - images are often blurry</td>
+<td>Good</td>
+<td>Good, but blurrier than pure GAN</td>
+<td>Very good</td>
+<td>Very good</td>
+</tr>
+</tbody></table>
+<p>Overall, flow matching is a pretty good balance between speed, quality, and inference time. However, due to the high amounts of attention diffusion and flow matching models tend to use in the U-net, the models may require unwieldly amounts of VRAM and train time if we try to make the images any bigger than 128x128 or so. This is why latent diffusion (which can be trivially extended to flow matching) was invented, but we will not cover that today as we will just be working with the 28x28 Fashion MNIST dataset.</p>
+<h2 id="Math"><a href="#Math" class="headerlink" title="Math"></a>Math</h2><p>I shall now cover the math of the flow matching techniques. I will casually ignore all the fancy probability and integrals used in the official paper (because admittedly I can’t understand a good chunk of it too), and use the simplest interpretation instead - the linear interpolation interpretation.</p>
+<p>Let us start off by defining some terms. Let $x$ be the image, and $z$ be random noise. We start off at complete random noise at $t &#x3D; 0$. Then all we need to do is draw a line (ie linearly interpolate) between $z$ and $x$, from $t &#x3D; 0$ to $t &#x3D; 1$. We will represent the model as $f$.</p>
+<p>$$<br>x_{t} &#x3D; xt + (1-t)z\\<br>\frac{dx_{t}}{dt} &#x3D; x - z\\<br>f(x_{t}, t) &#x3D; \frac{dx_{t}}{dt} &#x3D; x - z<br>$$</p>
+<p>As such, all we have to do is train the model to find $x - z$, given $x_{t}$ and $t$.</p>
+<h2 id="Architecture"><a href="#Architecture" class="headerlink" title="Architecture"></a>Architecture</h2><p>We will design the model in a classical U-net format, but after each of the convolution blocks, we introduce a self-attention. You can probably skip this whole section if you have implemented a diffusion model before.</p>
+<p>Note this picture is just to give a rough idea of what a U-net looks like, we will implement something rather different<br><img src="/media/flowmatch/unet.jpg" alt="Image of a generic unet model"></p>
+<h3 id="Time-embedding"><a href="#Time-embedding" class="headerlink" title="Time embedding"></a>Time embedding</h3><p>First we need to settle the time embedding, this we inject into every layer. Let $t$ be the time we want to obtain, $d$ be half the embedding dimension, and $x$ be the embedding.</p>
+<p>$$<br>x_{i} &#x3D; sin(\frac{t}{10000^{\frac{i}{d}}})<br>$$</p>
+<p>We take this equation but cos instead of sin, and concat it, to form the entire embedding. Here it is in code:</p>
+<figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">get_time_embedding</span>(<span class="params">time_steps, temb_dim</span>):</span><br><span class="line">    factor = <span class="number">10000</span> ** ((torch.arange(</span><br><span class="line">        start=<span class="number">0</span>, end=temb_dim // <span class="number">2</span>, dtype=torch.float32, device=time_steps.device) / (temb_dim // <span class="number">2</span>))</span><br><span class="line">    )</span><br><span class="line">    t_emb = time_steps[:, <span class="literal">None</span>].repeat(<span class="number">1</span>, temb_dim // <span class="number">2</span>) / factor</span><br><span class="line">    t_emb = torch.cat([torch.sin(t_emb), torch.cos(t_emb)], dim=-<span class="number">1</span>)</span><br><span class="line">    <span class="keyword">return</span> t_emb</span><br></pre></td></tr></table></figure>
+
+<h3 id="Downsample"><a href="#Downsample" class="headerlink" title="Downsample"></a>Downsample</h3><p>I will skip a lot of the code for brevity, you can find the full thing <a target="_blank" rel="noopener" href="https://gist.github.com/fern89/547a153084d0ad6a438bab7e4046095f">here</a></p>
+<figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">DownBlock</span>(nn.Module):</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__init__</span>(<span class="params">self, in_channels, out_channels, t_emb_dim, num_heads=<span class="number">4</span>, down_sample = <span class="literal">True</span>, attend = <span class="literal">True</span></span>):</span><br><span class="line">        <span class="built_in">super</span>().__init__()</span><br><span class="line">        ...</span><br><span class="line">        <span class="variable language_">self</span>.resnet_conv_first = nn.Sequential(</span><br><span class="line">            nn.GroupNorm(<span class="number">8</span>, in_channels),</span><br><span class="line">            nn.SiLU(),</span><br><span class="line">            nn.Conv2d(in_channels, out_channels,</span><br><span class="line">                      kernel_size=<span class="number">3</span>, stride=<span class="number">1</span>, padding=<span class="number">1</span>),</span><br><span class="line">        )</span><br><span class="line">        <span class="variable language_">self</span>.t_emb_layers = nn.Sequential(</span><br><span class="line">            nn.SiLU(),</span><br><span class="line">            nn.Linear(t_emb_dim, out_channels)</span><br><span class="line">        )</span><br><span class="line">        <span class="variable language_">self</span>.resnet_conv_second = ...</span><br><span class="line">        <span class="keyword">if</span> attend:</span><br><span class="line">            <span class="variable language_">self</span>.attention_norms = nn.GroupNorm(<span class="number">8</span>, out_channels)</span><br><span class="line">            </span><br><span class="line">            <span class="variable language_">self</span>.attentions = nn.MultiheadAttention(out_channels, num_heads, batch_first=<span class="literal">True</span>)</span><br><span class="line"></span><br><span class="line">        <span class="variable language_">self</span>.residual_input_conv = nn.Conv2d(in_channels, out_channels, kernel_size=<span class="number">1</span>)</span><br><span class="line">        </span><br><span class="line">        <span class="variable language_">self</span>.down_sample_conv = nn.Conv2d(out_channels, out_channels,</span><br><span class="line">                                          <span class="number">4</span>, <span class="number">2</span>, <span class="number">1</span>) <span class="keyword">if</span> <span class="variable language_">self</span>.down_sample <span class="keyword">else</span> nn.Identity()</span><br><span class="line">    </span><br></pre></td></tr></table></figure>
+<p>And the forward code,</p>
+<figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">forward</span>(<span class="params">self, x, t_emb</span>):</span><br><span class="line">    out = x</span><br><span class="line">    resnet_input = out</span><br><span class="line">    out = <span class="variable language_">self</span>.resnet_conv_first(out)</span><br><span class="line">    out = out + <span class="variable language_">self</span>.t_emb_layers(t_emb)[:, :, <span class="literal">None</span>, <span class="literal">None</span>]</span><br><span class="line">    out = <span class="variable language_">self</span>.resnet_conv_second(out)</span><br><span class="line">    out = out + <span class="variable language_">self</span>.residual_input_conv(resnet_input)</span><br><span class="line">    <span class="keyword">if</span> <span class="variable language_">self</span>.attend:</span><br><span class="line">        batch_size, channels, h, w = out.shape</span><br><span class="line">        in_attn = out.reshape(batch_size, channels, h * w)</span><br><span class="line">        in_attn = <span class="variable language_">self</span>.attention_norms(in_attn)</span><br><span class="line">        in_attn = in_attn.transpose(<span class="number">1</span>, <span class="number">2</span>)</span><br><span class="line">        out_attn, _ = <span class="variable language_">self</span>.attentions(in_attn, in_attn, in_attn)</span><br><span class="line">        out_attn = out_attn.transpose(<span class="number">1</span>, <span class="number">2</span>).reshape(batch_size, channels, h, w)</span><br><span class="line">        out = out + out_attn</span><br><span class="line">        </span><br><span class="line">    out = <span class="variable language_">self</span>.down_sample_conv(out)</span><br><span class="line">    <span class="keyword">return</span> out</span><br></pre></td></tr></table></figure>
+<p>Note how we inject the time embedding in between the conv layers. We do this for every layer later as well. Another key thing to note is only downsample AFTER you do everything. And do the reverse for the upsampling portion later in the up block. Otherwise you’ll just get a total mess of an output. Not too sure how related, but do check out <a target="_blank" rel="noopener" href="https://distill.pub/2016/deconv-checkerboard/">this article</a>.</p>
+<h3 id="Middle-block"><a href="#Middle-block" class="headerlink" title="Middle block"></a>Middle block</h3><p>I will skip the initialization code, it’s just the same as that of the downsampler. For this block, instead of resnet -&gt; attention, we do resnet -&gt; attention -&gt; resnet.</p>
+<figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">forward</span>(<span class="params">self, x, t_emb</span>):</span><br><span class="line">    out = x</span><br><span class="line">    resnet_input = out</span><br><span class="line">    out = <span class="variable language_">self</span>.resnet_convs[<span class="number">0</span>](out)</span><br><span class="line">    out = out + <span class="variable language_">self</span>.t_emb_layers[<span class="number">0</span>](t_emb)[:, :, <span class="literal">None</span>, <span class="literal">None</span>]</span><br><span class="line">    out = <span class="variable language_">self</span>.resnet_convs[<span class="number">1</span>](out)</span><br><span class="line">    out = out + <span class="variable language_">self</span>.residual_input_conv[<span class="number">0</span>](resnet_input)</span><br><span class="line"></span><br><span class="line">    batch_size, channels, h, w = out.shape</span><br><span class="line">    in_attn = out.reshape(batch_size, channels, h * w)</span><br><span class="line">    in_attn = <span class="variable language_">self</span>.attention_norms(in_attn)</span><br><span class="line">    in_attn = in_attn.transpose(<span class="number">1</span>, <span class="number">2</span>)</span><br><span class="line">    out_attn, _ = <span class="variable language_">self</span>.attentions(in_attn, in_attn, in_attn)</span><br><span class="line">    out_attn = out_attn.transpose(<span class="number">1</span>, <span class="number">2</span>).reshape(batch_size, channels, h, w)</span><br><span class="line">    out = out + out_attn</span><br><span class="line">    </span><br><span class="line">    resnet_input = out</span><br><span class="line">    out = <span class="variable language_">self</span>.resnet_convs[<span class="number">2</span>](out)</span><br><span class="line">    out = out + <span class="variable language_">self</span>.t_emb_layers[<span class="number">1</span>](t_emb)[:, :, <span class="literal">None</span>, <span class="literal">None</span>]</span><br><span class="line">    out = <span class="variable language_">self</span>.resnet_convs[<span class="number">3</span>](out)</span><br><span class="line">    out = out + <span class="variable language_">self</span>.residual_input_conv[<span class="number">1</span>](resnet_input)</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">return</span> out</span><br></pre></td></tr></table></figure>
+
+<h3 id="Upsample"><a href="#Upsample" class="headerlink" title="Upsample"></a>Upsample</h3><p>Now for the upsample,</p>
+<figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">UpBlock</span>(nn.Module):</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__init__</span>(<span class="params">self, in_channels, out_channels, t_emb_dim, up_sample=<span class="literal">True</span>, num_heads=<span class="number">4</span>, attend = <span class="literal">True</span></span>):</span><br><span class="line">        <span class="built_in">super</span>().__init__()</span><br><span class="line">        ...</span><br><span class="line">        <span class="variable language_">self</span>.up_sample_conv = nn.ConvTranspose2d(in_channels // <span class="number">2</span>, in_channels // <span class="number">2</span>,</span><br><span class="line">                                                 <span class="number">4</span>, <span class="number">2</span>, <span class="number">1</span>) \</span><br><span class="line">            <span class="keyword">if</span> <span class="variable language_">self</span>.up_sample <span class="keyword">else</span> nn.Identity()</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">forward</span>(<span class="params">self, x, out_down, t_emb</span>):</span><br><span class="line">        x = <span class="variable language_">self</span>.up_sample_conv(x)</span><br><span class="line">        x = torch.cat([x, out_down], dim=<span class="number">1</span>)</span><br><span class="line">        out = x</span><br><span class="line">        resnet_input = out</span><br><span class="line">        out = <span class="variable language_">self</span>.resnet_conv_first(out)</span><br><span class="line">        out = out + <span class="variable language_">self</span>.t_emb_layers(t_emb)[:, :, <span class="literal">None</span>, <span class="literal">None</span>]</span><br><span class="line">        out = <span class="variable language_">self</span>.resnet_conv_second(out)</span><br><span class="line">        out = out + <span class="variable language_">self</span>.residual_input_conv(resnet_input)</span><br><span class="line">        <span class="keyword">if</span> <span class="variable language_">self</span>.attend:</span><br><span class="line">            batch_size, channels, h, w = out.shape</span><br><span class="line">            in_attn = out.reshape(batch_size, channels, h * w)</span><br><span class="line">            in_attn = <span class="variable language_">self</span>.attention_norms(in_attn)</span><br><span class="line">            in_attn = in_attn.transpose(<span class="number">1</span>, <span class="number">2</span>)</span><br><span class="line">            out_attn, _ = <span class="variable language_">self</span>.attentions(in_attn, in_attn, in_attn)</span><br><span class="line">            out_attn = out_attn.transpose(<span class="number">1</span>, <span class="number">2</span>).reshape(batch_size, channels, h, w)</span><br><span class="line">            out = out + out_attn</span><br><span class="line">        </span><br><span class="line">        <span class="keyword">return</span> out</span><br></pre></td></tr></table></figure>
+<p>As you will note, we first upsample with ConvTranspose2d, then we concat with the respective downsample block, for the U-net residuals. We do this in the channel dimensions.</p>
+<h3 id="U-net"><a href="#U-net" class="headerlink" title="U-net"></a>U-net</h3><p>Now we piece them all together.</p>
+<figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Unet</span>(nn.Module):</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__init__</span>(<span class="params">self, im_channels, down_channels, mid_channels, t_emb_dim, down_sample, attend</span>):</span><br><span class="line">        <span class="built_in">super</span>().__init__()</span><br><span class="line">        <span class="variable language_">self</span>.down_channels = down_channels</span><br><span class="line">        <span class="variable language_">self</span>.mid_channels = mid_channels</span><br><span class="line">        <span class="variable language_">self</span>.t_emb_dim = t_emb_dim</span><br><span class="line">        <span class="variable language_">self</span>.down_sample = down_sample</span><br><span class="line"></span><br><span class="line">        <span class="variable language_">self</span>.t_proj = nn.Sequential(</span><br><span class="line">            nn.Linear(<span class="variable language_">self</span>.t_emb_dim, <span class="variable language_">self</span>.t_emb_dim),</span><br><span class="line">            nn.SiLU(),</span><br><span class="line">            nn.Linear(<span class="variable language_">self</span>.t_emb_dim, <span class="variable language_">self</span>.t_emb_dim)</span><br><span class="line">        )</span><br><span class="line"></span><br><span class="line">        <span class="variable language_">self</span>.up_sample = <span class="built_in">list</span>(<span class="built_in">reversed</span>(<span class="variable language_">self</span>.down_sample))</span><br><span class="line">        ...</span><br><span class="line">        <span class="variable language_">self</span>.norm_out = nn.GroupNorm(<span class="number">8</span>, <span class="number">16</span>)</span><br><span class="line">        <span class="variable language_">self</span>.conv_out = nn.Conv2d(<span class="number">16</span>, im_channels, kernel_size=<span class="number">3</span>, padding=<span class="number">1</span>)</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">forward</span>(<span class="params">self, x, t</span>):</span><br><span class="line">        out = <span class="variable language_">self</span>.conv_in(x)</span><br><span class="line">        t_emb = get_time_embedding(t, <span class="variable language_">self</span>.t_emb_dim)</span><br><span class="line">        t_emb = <span class="variable language_">self</span>.t_proj(t_emb)</span><br><span class="line">        </span><br><span class="line">        down_outs = []</span><br><span class="line">        </span><br><span class="line">        <span class="keyword">for</span> idx, down <span class="keyword">in</span> <span class="built_in">enumerate</span>(<span class="variable language_">self</span>.downs):</span><br><span class="line">            down_outs.append(out)</span><br><span class="line">            out = down(out, t_emb)</span><br><span class="line">        <span class="keyword">for</span> mid <span class="keyword">in</span> <span class="variable language_">self</span>.mids:</span><br><span class="line">            out = mid(out, t_emb)</span><br><span class="line">        <span class="keyword">for</span> up <span class="keyword">in</span> <span class="variable language_">self</span>.ups:</span><br><span class="line">            down_out = down_outs.pop()</span><br><span class="line">            out = up(out, down_out, t_emb)</span><br><span class="line">        out = <span class="variable language_">self</span>.norm_out(out)</span><br><span class="line">        out = nn.SiLU()(out)</span><br><span class="line">        out = <span class="variable language_">self</span>.conv_out(out)</span><br><span class="line">        <span class="keyword">return</span> out</span><br></pre></td></tr></table></figure>
+
+<p>And just like that, we have implemented our model! Finally, let us do some trainings</p>
+<h2 id="Training"><a href="#Training" class="headerlink" title="Training"></a>Training</h2><p>We prepare the dataset, we will use Fashion MNIST,</p>
+<figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">dataset_dir = <span class="string">&quot;datasets/&quot;</span></span><br><span class="line"></span><br><span class="line">transforms_fmnist = transforms.Compose([transforms.ToTensor()])</span><br><span class="line">train_dataset = FashionMNIST(root=dataset_dir,</span><br><span class="line">                             train=<span class="literal">True</span>,</span><br><span class="line">                             download=<span class="literal">True</span>,</span><br><span class="line">                             transform=transforms_fmnist)</span><br><span class="line">BATCH_SIZE = <span class="number">256</span></span><br><span class="line">train_dataloader = DataLoader(dataset=train_dataset,</span><br><span class="line">                              batch_size=BATCH_SIZE,</span><br><span class="line">                              shuffle=<span class="literal">True</span>)</span><br></pre></td></tr></table></figure>
+
+<p>Prepare the model,</p>
+<figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">device = torch.device(<span class="string">&#x27;cuda&#x27;</span> <span class="keyword">if</span> torch.cuda.is_available() <span class="keyword">else</span> <span class="string">&#x27;cpu&#x27;</span>)</span><br><span class="line"></span><br><span class="line">model = Unet(im_channels = <span class="number">1</span>,</span><br><span class="line">             down_channels = [<span class="number">32</span>, <span class="number">64</span>, <span class="number">128</span>], </span><br><span class="line">             mid_channels = [<span class="number">128</span>, <span class="number">64</span>], </span><br><span class="line">             t_emb_dim = <span class="number">128</span>, </span><br><span class="line">             down_sample = [<span class="literal">True</span>, <span class="literal">True</span>],</span><br><span class="line">             attend = [<span class="literal">False</span>, <span class="literal">True</span>]).to(device)</span><br><span class="line">model.train()</span><br><span class="line">num_epochs = <span class="number">10</span></span><br><span class="line">optimizer = Adam(model.parameters(), lr=<span class="number">1e-3</span>)</span><br><span class="line">criterion = torch.nn.MSELoss()</span><br></pre></td></tr></table></figure>
+
+<p>Finally, train it</p>
+<figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">model.train()</span><br><span class="line"><span class="keyword">for</span> epoch_idx <span class="keyword">in</span> <span class="built_in">range</span>(num_epochs):</span><br><span class="line">    losses = []</span><br><span class="line">    <span class="keyword">for</span> im, _ <span class="keyword">in</span> tqdm(train_dataloader):</span><br><span class="line">        optimizer.zero_grad()</span><br><span class="line">        im = im.<span class="built_in">float</span>().to(device)</span><br><span class="line">        im = (<span class="number">2</span> * im) - <span class="number">1</span></span><br><span class="line">        </span><br><span class="line">        t = torch.rand((im.shape[<span class="number">0</span>])).to(device)</span><br><span class="line">        noise = torch.randn_like(im).to(device)</span><br><span class="line">        </span><br><span class="line">        noisy_im = im * t[:, <span class="literal">None</span>, <span class="literal">None</span>, <span class="literal">None</span>] + (<span class="number">1</span> - t)[:, <span class="literal">None</span>, <span class="literal">None</span>, <span class="literal">None</span>] * noise</span><br><span class="line">        v_pred = model(noisy_im, t)</span><br><span class="line"></span><br><span class="line">        loss = criterion(v_pred, im - noise)</span><br><span class="line">        losses.append(loss.item())</span><br><span class="line">        loss.backward()</span><br><span class="line">        optimizer.step()</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">&#x27;Finished epoch:&#123;&#125; | Loss : &#123;:.4f&#125;&#x27;</span>.<span class="built_in">format</span>(</span><br><span class="line">        epoch_idx + <span class="number">1</span>,</span><br><span class="line">        np.mean(losses),</span><br><span class="line">    ))</span><br></pre></td></tr></table></figure>
+
+<p>Note how as mentioned, we are training the model to find $x - z$, given $x_{t}$ and $t$.</p>
+<p>As for inference, we will just use simple Euler methods to solve the ODE represented with $\frac{dx_{t}}{dt}$, to find $x$ given completely random noise.</p>
+<figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">n_step = <span class="number">100</span></span><br><span class="line">model.<span class="built_in">eval</span>()</span><br><span class="line">xt = torch.randn((<span class="number">128</span>, <span class="number">1</span>, <span class="number">28</span>, <span class="number">28</span>)).to(device)</span><br><span class="line"><span class="keyword">with</span> torch.no_grad():</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> tqdm(<span class="built_in">range</span>(n_step)):</span><br><span class="line">        velo = model(xt, torch.as_tensor(i / n_step).unsqueeze(<span class="number">0</span>).to(device))</span><br><span class="line">        xt = xt + velo / n_step</span><br><span class="line"></span><br><span class="line">ims = torch.clamp(xt, -<span class="number">1.</span>, <span class="number">1.</span>).detach().cpu()</span><br><span class="line">ims = (ims + <span class="number">1</span>) / <span class="number">2</span></span><br><span class="line">grid = make_grid(ims, nrow=<span class="number">16</span>)</span><br><span class="line">img = torchvision.transforms.ToPILImage()(grid)</span><br><span class="line">img.save(<span class="string">&#x27;out.png&#x27;</span>)</span><br><span class="line">img.close()</span><br><span class="line">model.train()</span><br></pre></td></tr></table></figure>
+
+<p>And that’s it! We now have implemented and trained a flow matching model on Fashion MNIST! Once again, full code is available <a target="_blank" rel="noopener" href="https://gist.github.com/fern89/547a153084d0ad6a438bab7e4046095f">here</a></p>
+<p>Here is some sample output of the model, trained for ~4 mins on a P100 GPU, 5 epochs:</p>
+<p><img src="/media/flowmatch/gens.png" alt="Image of some clothes generated by the model"></p>
+<h2 id="References"><a href="#References" class="headerlink" title="References"></a>References</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://github.com/explainingai-code/DDPM-Pytorch/">https://github.com/explainingai-code/DDPM-Pytorch/</a> - A large majority of the code showcased is edited from here</li>
+<li><a target="_blank" rel="noopener" href="https://arxiv.org/abs/2210.02747">https://arxiv.org/abs/2210.02747</a> - The original flow matching paper</li>
+</ul>
+
+  </div>
+</article>
+
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+        
+          <li><a href="/">Home</a></li>
+        
+          <li><a href="/about/">About</a></li>
+        
+          <li><a href="/archives/">Writing</a></li>
+        
+      </ul>
+    </div>
+
+    
+    
+      <div id="toc-footer" style="display: none">
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Literature-Review"><span class="toc-number">1.</span> <span class="toc-text">Literature Review</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Math"><span class="toc-number">2.</span> <span class="toc-text">Math</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Architecture"><span class="toc-number">3.</span> <span class="toc-text">Architecture</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Time-embedding"><span class="toc-number">3.1.</span> <span class="toc-text">Time embedding</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Downsample"><span class="toc-number">3.2.</span> <span class="toc-text">Downsample</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Middle-block"><span class="toc-number">3.3.</span> <span class="toc-text">Middle block</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Upsample"><span class="toc-number">3.4.</span> <span class="toc-text">Upsample</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#U-net"><span class="toc-number">3.5.</span> <span class="toc-text">U-net</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Training"><span class="toc-number">4.</span> <span class="toc-text">Training</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#References"><span class="toc-number">5.</span> <span class="toc-text">References</span></a></li></ol>
+      </div>
+    
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=http://example.com/2025/06/03/flowmatch/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=http://example.com/2025/06/03/flowmatch/&text=Flow Matching"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=http://example.com/2025/06/03/flowmatch/&title=Flow Matching"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=http://example.com/2025/06/03/flowmatch/&is_video=false&description=Flow Matching"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=Flow Matching&body=Check out this article: http://example.com/2025/06/03/flowmatch/"><i class="fa-solid fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=http://example.com/2025/06/03/flowmatch/&title=Flow Matching"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=http://example.com/2025/06/03/flowmatch/&title=Flow Matching"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=http://example.com/2025/06/03/flowmatch/&title=Flow Matching"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=http://example.com/2025/06/03/flowmatch/&title=Flow Matching"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=http://example.com/2025/06/03/flowmatch/&name=Flow Matching&description="><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=http://example.com/2025/06/03/flowmatch/&t=Flow Matching"><i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fa-solid fa-bars fa-lg" aria-hidden="true"></i> Menu</a>
+        
+          <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fa-solid fa-list fa-lg" aria-hidden="true"></i> TOC</a>
+        
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fa-solid fa-share-alt fa-lg" aria-hidden="true"></i> Share</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy;
+    
+    
+    2024-2025
+    fern
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/about/">About</a></li><!--
+     --><!--
+       --><li><a href="/archives/">Writing</a></li><!--
+     -->
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+
+
+
+  <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" onload="this.onload=null;this.rel='stylesheet'"/>
+
+
+    <!-- jquery -->
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" crossorigin="anonymous"></script>
+
+
+
+
+<!-- clipboard -->
+
+  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.7/clipboard.min.js" crossorigin="anonymous"></script>
+  
+  <script type="text/javascript">
+  $(function() {
+    // copy-btn HTML
+    var btn = "<span class=\"btn-copy tooltipped tooltipped-sw\" aria-label=\"Copy to clipboard!\">";
+    btn += '<i class="fa-regular fa-clone"></i>';
+    btn += '</span>';
+    // mount it!
+    $(".highlight table").before(btn);
+    var clip = new ClipboardJS('.btn-copy', {
+      text: function(trigger) {
+        return Array.from(trigger.nextElementSibling.querySelectorAll('.code')).reduce((str,it)=>str+it.innerText+'\n','')
+      }
+    });
+    clip.on('success', function(e) {
+      e.trigger.setAttribute('aria-label', "Copied!");
+      e.clearSelection();
+    })
+  })
+  </script>
+
+
+<script src="/js/main.js"></script>
+
+<!-- search -->
+
+<!-- Baidu Analytics -->
+
+<!-- Cloudflare Analytics -->
+
+  <script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "e2c0a56b5d4d466baf300058fd41c3e8"}'></script>
+
+<!-- Disqus Comments -->
+
+<!-- utterances Comments -->
+
+</body>
+</html>

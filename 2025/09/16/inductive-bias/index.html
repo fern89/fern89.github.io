@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang=en>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+    <meta name="description" content="Understanding inductive biases and their uses">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Inductive biases">
+<meta property="og:url" content="http://example.com/2025/09/16/inductive-bias/index.html">
+<meta property="og:site_name" content="fern&#39;s blog">
+<meta property="og:description" content="Understanding inductive biases and their uses">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="http://example.com/media/inductivebias/machinelearning.png">
+<meta property="og:image" content="http://example.com/media/inductivebias/figure.png">
+<meta property="article:published_time" content="2025-09-16T05:28:52.000Z">
+<meta property="article:modified_time" content="2025-09-16T15:29:24.474Z">
+<meta property="article:author" content="fern">
+<meta property="article:tag" content="machine-learning">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/media/inductivebias/machinelearning.png">
+    
+    
+      
+        
+          <link rel="shortcut icon" href="/images/favicon.ico">
+        
+      
+      
+        
+          <link rel="icon" type="image/png" href="/images/android-chrome-192x192.png" sizes="192x192">
+        
+      
+      
+        
+          <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+        
+      
+    
+    <!-- title -->
+    <title>Inductive biases</title>
+    <!-- async scripts -->
+    <!-- Google Analytics -->
+
+
+    <!-- Umami Analytics -->
+
+
+    <!-- styles -->
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <!-- persian styles -->
+    
+    <!-- rss -->
+    
+    
+	<!-- mathjax -->
+	
+		<script type="text/x-mathjax-config">
+		  MathJax.Hub.Config({
+			tex2jax: {
+			  skipTags: ['script', 'noscript', 'style', 'textarea', 'pre'],
+			  inlineMath: [['$','$']]
+			}
+		  });
+		</script>
+		<script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-MML-AM_CHTML' async></script>
+	
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
+<!-- hexo injector head_end end --><meta name="generator" content="Hexo 7.3.0"></head>
+
+<body class="max-width mx-auto px3 ltr">
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#" aria-label="Menu"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#" aria-label="Menu"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" aria-label="Top" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fa-solid fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/about/">About</a></li><!--
+     --><!--
+       --><li><a href="/archives/">Writing</a></li><!--
+     -->
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        
+        <li><a class="icon" aria-label="Next post" href="/2025/06/03/flowmatch/"><i class="fa-solid fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" aria-label="Back to top" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" aria-label="Share post" href="#"><i class="fa-solid fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=http://example.com/2025/09/16/inductive-bias/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=http://example.com/2025/09/16/inductive-bias/&text=Inductive biases"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=http://example.com/2025/09/16/inductive-bias/&title=Inductive biases"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=http://example.com/2025/09/16/inductive-bias/&is_video=false&description=Inductive biases"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=Inductive biases&body=Check out this article: http://example.com/2025/09/16/inductive-bias/"><i class="fa-solid fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=http://example.com/2025/09/16/inductive-bias/&title=Inductive biases"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=http://example.com/2025/09/16/inductive-bias/&title=Inductive biases"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=http://example.com/2025/09/16/inductive-bias/&title=Inductive biases"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=http://example.com/2025/09/16/inductive-bias/&title=Inductive biases"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=http://example.com/2025/09/16/inductive-bias/&name=Inductive biases&description="><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=http://example.com/2025/09/16/inductive-bias/&t=Inductive biases"><i class="fab fa-hacker-news " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    
+    
+      <div id="toc">
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#What-are-inductive-biases"><span class="toc-number">1.</span> <span class="toc-text">What are inductive biases?</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Interpretation"><span class="toc-number">2.</span> <span class="toc-text">Interpretation</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Applications"><span class="toc-number">3.</span> <span class="toc-text">Applications</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Conclusion"><span class="toc-number">4.</span> <span class="toc-text">Conclusion</span></a></li></ol>
+      </div>
+    
+  </span>
+</div>
+
+    
+    <div class="content index py4 ">
+        
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle p-name" itemprop="name headline">
+        Inductive biases
+    </h1>
+
+
+
+    <div class="meta">
+      fern
+      
+    <div class="postdate">
+      
+        <time datetime="2025-09-16T05:28:52.000Z" class="dt-published" itemprop="datePublished">2025-09-16</time>
+        
+      
+    </div>
+
+
+      
+
+      
+    <div class="article-tag">
+        <i class="fa-solid fa-tag"></i>
+        <a class="p-category" href="/tags/machine-learning/" rel="tag">machine-learning</a>
+    </div>
+
+
+    </div>
+  </header>
+  
+
+  <div class="content e-content" itemprop="articleBody">
+    <p>Have you ever wondered why we have so many different architectures for machine learning models? This is especially prevalent in the field of computer vision, for instance, in image classification we have resnets, ViTs, and a whole litany of slight modifications of the above 2. While in object detection, we have YOLO, SSD, DETR, R-CNNs, and so much more. What sets apart these architectures, and why can’t we just have one major architecture that just works?</p>
+<p>This is where the concept of inductive biases comes in. I believe the major thing setting apart the commonly used architectures, is the levels of inductive biases they have. Understanding how inductive biases are introduced, is also critical to understanding modern deep learning in general. It allows you to draw connections between seemingly unrelated architectures, and select the best ones for your own uses cases. So, what even are inductive biases?</p>
+<h2 id="What-are-inductive-biases"><a href="#What-are-inductive-biases" class="headerlink" title="What are inductive biases?"></a>What are inductive biases?</h2><p>The simplest way to explain inductive biases, is that they are assumptions our model architecture (or possibly even our training method, as will be discussed later) makes about the data. And what does this mean? Well, let us take the example of resnets and ViTs. </p>
+<p>As we know, ViTs often have superior performance compared to resnets, but they take a significantly longer time to hit the same performance of resnet (for instance, ViT converges to 95% accuracy while resnet can only converge to 90%, but to hit 85%, ViT takes 10 hour of training while resnet only takes 1 hour). This all boils down to the <strong>inductive biases</strong> present within resnets!</p>
+<p><img src="/media/inductivebias/machinelearning.png" alt="Graphs of structure against compute"></p>
+<p>In essence, resnets are an example of the “more structure” models in the above infographic, while ViTs are the “less structure”. The structure of resnets comes with the implicit assumption that details that are near in proximity to one another have strong relations, which comes with the design of convolutions (which only take vicinal pixels into account when doing the scan). Meanwhile, ViTs allow all parts of the image to attend to one another, allowing for a far more global understanding of context, while having reduced inductive biases. However, it is due to this much larger access to information, that causes ViTs to have massively increased training times as compared to resnets.</p>
+<h2 id="Interpretation"><a href="#Interpretation" class="headerlink" title="Interpretation"></a>Interpretation</h2><p>We can interpret inductive biases as reducing the degrees of freedom the network has available. We effectively constrain the solution space to something much smaller than that of a model with lesser inductive biases. This can be interpreted in the sense that, the average distance between a random set of parameters and a minima is much higher for ViTs than resnets.</p>
+<p>But as ViTs have a wider solution space and more degrees of freedom, the solution the model converges to would also be superior, as while the inductive biases of resnets are very good abstractions, they still are abstractions. </p>
+<p>To make an analogy, while C (let us ignore inline assembly) allows one to write a great many programs, the set of all the programs that can be written in C is a subset of all programs that can be written in assembly. While assembly takes much longer to write than C, the best solution to a problem written in assembly would pretty much always outperform the best solution written in C (see: ffmpeg codebase).</p>
+<h2 id="Applications"><a href="#Applications" class="headerlink" title="Applications"></a>Applications</h2><p>So, why should one even care for inductive biases? I feel inductive biases allow one to effectively draw connections between many modern architectures, and better understand <strong>how</strong> many performance boosts are obtained. This may even extend to training methods! Let’s have another example - <a target="_blank" rel="noopener" href="https://arxiv.org/abs/2501.04765v2">https://arxiv.org/abs/2501.04765v2</a>, this is the paper that inspired me to write this blog post in the first place, do take a look.</p>
+<p><img src="/media/inductivebias/figure.png" alt="Image of model token routing"></p>
+<p>Simply put, this paper proposes a method to significantly decrease training time of diffusion transformers, by randomly selecting a fraction of the tokens to skip some layers. This reduces the training time significantly, orders of magnitude faster than without this technique. So, what inductive biases are introduced? Please take some time to ponder before continuing.</p>
+<p>If we think about it, the bias introduced is actually remarkably similar to those introduced by latent diffusion models. Simply put, we assume a low density of information in images, and that if we already have a low resolution version of an image, we can upscale it relatively trivially with few model layers. This leads to the likely trade-off that the model will be less capable when it comes to fine details, for instance, hands (which has been a notorious weakness of most image generation models up till very recently, as most models perform diffusion in a lower dimensional latent space).</p>
+<p>By analyzing inductive biases introduced, we are able to effectively link two weakly related model designs, and see how one is just the other expressed at the training level instead of the architecture level. Arguably, this training method should outperform the standard latent diffusion model, as it is less rigidly built, and the random token bypass is also a very strong form of regularization, allowing the model to form many internal ensembles.</p>
+<h2 id="Conclusion"><a href="#Conclusion" class="headerlink" title="Conclusion"></a>Conclusion</h2><p>A strong comprehension of inductive biases is critical for effective understanding of modern neural network design. Oftentimes, when reading new papers, I try to think about the inductive biases present, and what exactly is the trade-off we are making when we use it. I would recommend that anyone interested in gaining a more solid foundation in machine learning, try their hand at spotting the inductive biases of various architectures and designs, for the world of machine learning really is quite beautifully interlinked, if you can see it.</p>
+
+  </div>
+</article>
+
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+        
+          <li><a href="/">Home</a></li>
+        
+          <li><a href="/about/">About</a></li>
+        
+          <li><a href="/archives/">Writing</a></li>
+        
+      </ul>
+    </div>
+
+    
+    
+      <div id="toc-footer" style="display: none">
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#What-are-inductive-biases"><span class="toc-number">1.</span> <span class="toc-text">What are inductive biases?</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Interpretation"><span class="toc-number">2.</span> <span class="toc-text">Interpretation</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Applications"><span class="toc-number">3.</span> <span class="toc-text">Applications</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Conclusion"><span class="toc-number">4.</span> <span class="toc-text">Conclusion</span></a></li></ol>
+      </div>
+    
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=http://example.com/2025/09/16/inductive-bias/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=http://example.com/2025/09/16/inductive-bias/&text=Inductive biases"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=http://example.com/2025/09/16/inductive-bias/&title=Inductive biases"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=http://example.com/2025/09/16/inductive-bias/&is_video=false&description=Inductive biases"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=Inductive biases&body=Check out this article: http://example.com/2025/09/16/inductive-bias/"><i class="fa-solid fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=http://example.com/2025/09/16/inductive-bias/&title=Inductive biases"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=http://example.com/2025/09/16/inductive-bias/&title=Inductive biases"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=http://example.com/2025/09/16/inductive-bias/&title=Inductive biases"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=http://example.com/2025/09/16/inductive-bias/&title=Inductive biases"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=http://example.com/2025/09/16/inductive-bias/&name=Inductive biases&description="><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=http://example.com/2025/09/16/inductive-bias/&t=Inductive biases"><i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fa-solid fa-bars fa-lg" aria-hidden="true"></i> Menu</a>
+        
+          <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fa-solid fa-list fa-lg" aria-hidden="true"></i> TOC</a>
+        
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fa-solid fa-share-alt fa-lg" aria-hidden="true"></i> Share</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy;
+    
+    
+    2024-2025
+    fern
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/about/">About</a></li><!--
+     --><!--
+       --><li><a href="/archives/">Writing</a></li><!--
+     -->
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+
+
+
+  <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" onload="this.onload=null;this.rel='stylesheet'"/>
+
+
+    <!-- jquery -->
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" crossorigin="anonymous"></script>
+
+
+
+
+<!-- clipboard -->
+
+  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.7/clipboard.min.js" crossorigin="anonymous"></script>
+  
+  <script type="text/javascript">
+  $(function() {
+    // copy-btn HTML
+    var btn = "<span class=\"btn-copy tooltipped tooltipped-sw\" aria-label=\"Copy to clipboard!\">";
+    btn += '<i class="fa-regular fa-clone"></i>';
+    btn += '</span>';
+    // mount it!
+    $(".highlight table").before(btn);
+    var clip = new ClipboardJS('.btn-copy', {
+      text: function(trigger) {
+        return Array.from(trigger.nextElementSibling.querySelectorAll('.code')).reduce((str,it)=>str+it.innerText+'\n','')
+      }
+    });
+    clip.on('success', function(e) {
+      e.trigger.setAttribute('aria-label', "Copied!");
+      e.clearSelection();
+    })
+  })
+  </script>
+
+
+<script src="/js/main.js"></script>
+
+<!-- search -->
+
+<!-- Baidu Analytics -->
+
+<!-- Cloudflare Analytics -->
+
+  <script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "e2c0a56b5d4d466baf300058fd41c3e8"}'></script>
+
+<!-- Disqus Comments -->
+
+<!-- utterances Comments -->
+
+</body>
+</html>

