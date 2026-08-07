@@ -1105,6 +1105,18 @@ article header .author {
 article header .postdate {
   display: inline;
 }
+article .runButton {
+  background-color: #2b2a33;
+  border-bottom-color: #8f8f9d;
+  border-left-color: #8f8f9d;
+  border-right-color: #8f8f9d;
+  border-top-color: #8f8f9d;
+  color: #fbfbfe;
+  fill: #000;
+  outline-color: #fbfbfe;
+  border-radius: 6px;
+  width: 10%;
+}
 article .content h2:before {
   position: absolute;
   top: -4px;
