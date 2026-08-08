@@ -36,5 +36,6 @@ User-agent: YouBot
 Disallow: /
 
 User-agent: *
+Disallow: /2026
 Disallow: /2025
 Disallow: /2024
